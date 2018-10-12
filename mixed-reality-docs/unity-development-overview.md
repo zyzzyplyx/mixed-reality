@@ -9,6 +9,38 @@ keywords: Unity, mixed reality, development, getting started, new project, porti
 ---
 
 
+Porting -> Porting Guide
+Reference MRTK Start Here Project for setup
+Manual Unity Setup -> Replaces Unity Recommended Settings
+
+Explain -> Goal is to setup development to 
+1) Work within WMR
+2) Run performantly 
+
+What is the goal?<br/>
+	Road to 60 or system FPS intro
+	Bullet point benefits, links to detailed info
+	Step 1 -> Add FPS prefab into scene
+
+Unity Settings<br/>
+	Low quality
+	Single-pass instanced Rendering
+
+Shader:<br/>
+	Unity Standard Shader
+	MRTK Standard Shader
+	Other useful shaders (Lambert, vertex lit) (Move operations from Pixel shader to vertex shader)
+o	How to get operation count in Unity
+
+Hologram Stability: <br/>
+	Stabilization Plane (Both)
+	Anchoring (Hololens)
+o	Spatial Anchors
+o	World Anchors
+
+Application Builds<br/>
+	Debug/Release/Master
+
 
 # Unity development overview
 
