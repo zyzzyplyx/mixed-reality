@@ -64,18 +64,52 @@ It is vital that developers and creators keep track of their framerate throughou
 >* [Advanced Performance Recommendations](advanced-performance-recommendations.md)
 
 ## Hologram Stability
-As noted above, applications with low frame rates will suffer from unstable and incorrectly drawn holograms. However, there are other important settings and components to be cognizant of during development to ensure optimal tracking and display of your scene(WC). This is particularly important on HoloLens. 
 
-### Late-Stage Reprojection (WC?) (Immersive Headsets & Hololens)
-As described above, Windows Mixed reality devices have hardware that adjusts the rendered image from your app to account for the discrepancy between the predicted head position and the actual head position. 
+Unlike traditional programming, holographic applications require various configurations to be properly set in order to ensure a smooth and stable user experience. Failure to set up your application appropriately may result in experience with accuracy misalignment, jitter, judder, drift, jumpiness, etc. This is particularly more problematic on HoloLens. 
 
-Deep dive link 
-	RS1 API vs 
-	How to see in WebB
+<span style="color:red"> { INSERT GIF OF SWIMMING OR OTHER BAD EXPERIENCE } </span>
+
+As noted in the previous, applications with low frame rates will suffer from unstable and incorrectly drawn holograms. However, there are other important settings and components to be cognizant of during development to ensure optimal tracking and display of your scene
+
+- Constant 60 FPS
+- [Late-Stage Reprojection (Immersive Headsets & Hololens)](#late-stage-reprojection-immersive-headsets--hololens)
+- [Anchoring (HoloLens Only)](#anchoring-hololens-only)
+- [Device Calibration](#device-calibration)
+- [Interpupillary Distance (IPD)](#interpupillary-distance-ipd)
+
+### Late-Stage Reprojection (Immersive Headsets & Hololens)
+As mentioned in the Frame Rate section above, Windows Mixed reality devices have hardware that adjusts the rendered image from your app to account for the discrepancy between the predicted head position and the actual head position.
+
+<span style="color:red"> Clean up below </span>
+- Explain "Enable depth buffer sharing" in Unity (requires Hololens with April or October 2018 update)
+- Manually set [Focus point in Unity](focus-point-in-unity.md) using [HolographicSettings.SetFocusPointForFrame()](https://docs.unity3d.com/550/Documentation/ScriptReference/VR.WSA.HolographicSettings.SetFocusPointForFrame.html)
+
+<span style="color:red">Deep dive link </span>
+
+>[!NOTE]
+> <span style="color:red"> Explain how to see Stabilization plane in WebB?
 
 ### Anchoring (HoloLens Only)
 
-- World Anchors
-- Spatial Anchors?
+<span style="color:red"> Add link to how hololens works? </span>
+HoloLens is constantly scanning and reasoning the current environment. The HoloLens platforms keeps track of multiple [coordinate systems](coordinate-systems.md) and their relationship to one another. The platform abstracts much of these calculations so that developers only have to worry about the [coordinate system in Unity](coordinate-systems-in-unity.md). 
+
+**[Anchoring](spatial-anchors.md)** though is a special concept whereby the developer can indicate to the HoloLens that a specific spot in space is of interest to their app experience. If a hologram should be _**anchored**_ to a particular point in physical space, you can attach a [WorldAnchor](https://docs.unity3d.com/2017.4/Documentation/ScriptReference/XR.WSA.WorldAnchor.html) component in Unity to the GameObject that should remain stable at one position. This will allow the platform to take over control of this GameObject's transform to ensure accurate positioning during app runtime.
+
+To learn more about how Anchor's work and best practices when using them, please read [Spatial anchors](spatial-anchors.md).
+
+>[!NOTE]
+> <span style="color:red"> Clean UP </span>
+> There is some misunderstanding on nomenclature with "anchors". World Anchors are components in Unity to lock a hologram while Spatial Anchors are the APIs
+
+### Device Calibration
+
+<span style="color:red"> CREATE CONTENT </span>
+
+### Interpupillary Distance (IPD)
+
+<span style="color:red"> Need graphic here </span>
+
+Explain what IPD is. how to set it in WebB or via API
 
 ## See Also
