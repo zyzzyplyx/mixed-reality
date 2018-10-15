@@ -212,28 +212,81 @@ Avoid interfaces and virtual methods in hot code such as inner loops. Interfaces
 
 ### CPU-to-GPU Performance Recommendations
 
+Generally, CPU-to-GPU performance comes down to the **draw calls** submitted to the graphics card. To improve performance, draw calls need to be strategically **a) reduced** or **b) restructured** for optimal results. Since draw calls themselves are resource-intensive, reducing them will reduce overall work required. Further, state changes between draw calls requires costly validation and translation steps in the graphics driver and thus, restructuring of your application's draw calls to limit state changes(i.e different materials, etc) can boost performance.
 
-https://docs.unity3d.com/Manual/DrawCallBatching.html
+Unity has a great article that gives an overview and dives into batching draw calls for their platform.
+- [Unity Draw Call Batching](https://docs.unity3d.com/Manual/DrawCallBatching.html)
 
-	Static Batching
-	Dynamic Batching
-	Single pass instanced rendering
+#### Single Pass Instanced Rendering
+
+Single Pass Instanced Rendering in Unity allows XR applications draw calls for each eye to be reduced down to one instanced draw call. Due to cache coherency between two draw calls, there is also some performance improvement on the GPU as well. 
+
+To enable this feature, open **Player Settings** (go to Edit > Project Settings > Player). In Player Settings, navigate to **XR Settings** at the bottom, check the **Virtual Reality Supported** box, then select **Single Pass Instanced (Preview)** from the Stereo Rendering Method drop-down menu.
+
+<span style="color:red"> Can we copy & credit images from unity?
+https://blogs.unity3d.com/2017/11/21/how-to-maximize-ar-and-vr-performance-with-advanced-stereo-rendering/>
+</span>
+
+Read the following articles from Unity for details with this rendering approach.
+- [How to maximize AR and VR performance with advanced stereo rendering](https://blogs.unity3d.com/2017/11/21/how-to-maximize-ar-and-vr-performance-with-advanced-stereo-rendering/)
+- [Single Pass Instancing](https://docs.unity3d.com/Manual/SinglePassInstancing.html) 
+
+>[!NOTE]
+> One common issue with Single Pass Instanced Rendering occurs if developers already have existing custom shaders not written for instancing. After enabling this feature, developers may notice some GameObjects only render in one eye. This is because the associated custom shaders do not have the appropriate properties for instancing 
+>
+> See [Single Pass Stereo Rendering for HoloLens](https://docs.unity3d.com/Manual/SinglePassStereoRenderingHoloLens.html) from Unity for how to address this problem
+
+#### Static Batching
+
+Static Batching works for most Renderer objects in Unity that **1) share the same material** and **2) are all marked as *Static*** (Select an object in Unity and click the checkbox in the top right of the inspector). GameObjects marked as *Static* cannot be moved throughout your application's runtime. Thus, static batching can be difficult to leverage on HoloLens where virtually every object needs to be placed, moved, scaled, etc. For immersive headsets, static batching can dramatically reduce draw calls and thus improve performance.
+
+Read *Static Batching* under [Draw Call Batching in Unity](https://docs.unity3d.com/Manual/DrawCallBatching.html) for more details.
+
+#### Dynamic Batching
+
+Since it is problematic to mark objects as *Static* for HoloLens development, dynamic batching can be a great tool to compensate for this lacking feature. Of course, it is can also be useful on immersive headsets as well. Dynamic batching in Unity can be difficult though to enable because GameObjects must **a) share the same Material** and **b) meet a long list of other criteria**. 
+
+Read *Dynamic Batching* under [Draw Call Batching in Unity](https://docs.unity3d.com/Manual/DrawCallBatching.html) for the full list. Most commonly, GameObjects become invalid to be batched dynamically because the associated mesh data can be no more than 300 vertices.
+
+#### Other Techniques
+
+Batching can only occur if multiple GameObjects are able to share the same material. Typically this will be blocked by the need for GameObjects to have a unique texture for their respective Material. It is common to combine Textures into one big Texture, a method known as [Texture Atlasing](https://en.wikipedia.org/wiki/Texture_atlas).
+
+Further, it is generally preferable to combine meshes into one GameObject where possible and reasonable. Each Renderer in Unity will have it's associated draw call(s) versus submitting a combined mesh under one Renderer. 
+
+>[!NOTE] 
+> Modifying properties of Renderer.material at runtime will create a copy of the Material and thus potentially break batching. Use Renderer.sharedMaterial to modify shared material properties across GameObjects.
 
 ### GPU Performance Recommendations
 
-o	Bandwidth vs Fill rate?
-	Full screen passes
-o	MSAA/HDR
-	Reduce Poly count
-	Shaders
-o	Move operations from Pixel to Vertex
-o	Explain how to get shader outputs
+#### Understand Bandwidth vs Fill Rate
+
+Talk about stuff*
+
+#### General
+
+- Reduce poly count -> LOD System
+- Limit overdraw
+- MSAA
+- Post Effects
+- Sub-pixel triangles are very expensive.
+- HoloLens => Avoid Geometry, Hull and Compute Shaders.
+- Single pass Instanced Rendering
+
+#### Shaders
+
+How to get shader stats ouptut
+Use bilinear whenever possible.
+such as trying to rearrange expressions to use the mad intrinsics in order to do a multiply and an add at the same time.
+And of course, precalculate as much as you can on the CPU and pass as constants to the material. Whenever that isn't possible, do as much as you can in the vertex shader. Even for things that vary per-pixel you can sometimes get away with doing parts of the calculation in the vertex shader.
 
 ### Memory Recommendations
 
 #### Avoid Allocations
+sdfsdf
 
 #### Object Pooling
+sdfsdf
 
 #### Garbage Collections
 
