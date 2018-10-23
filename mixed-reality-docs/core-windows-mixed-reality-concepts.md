@@ -12,9 +12,28 @@ keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR
 
 <span style="color:red">insert intro speel</span>
 
-## Key Concepts
 
-Windows Mixed Reality headsets use innovative hardware and software to provide a platform for your app to understand the user's physical space. 
+## Understanding Reality
+
+<span style="color:red">How to make caveats for immersive vs Hololens</span>
+
+Windows Mixed Reality allows developers to build 3D spatial applications by primarily understanding the user's physical space. In particular, the Windows Mixed Reality devices track the user's pose in their environment. A pose is a position and orientation that defines where the user is and where they are looking in your spatial application.
+
+<span style="color:red">INSERT GIF of camera visualization of pose/devicein space (side-by-side of real person?)</span>
+
+WMR builds camera pose (position, orientation)
+
+How does WMR figure out your position
+Inside-out tracking
+-> WMR build map of the world
+    -> Constantly learning & adjusting to reality
+    -> WMR looks to identify visual features in it's environment
+-> Builds map using tracking cameras 
+---> Link to deep dive
+
+## Understanding Interactions
+
+Windows Mixed Reality headsets use innovative hardware and software to provide a platform for your app to understand the user's physical space. Mixed Reality apps offer new interaction models compared to traditional application design. Below is a list of core mixed reality concepts that are essential to understand.
 
 | Feature | [HoloLens](hololens-hardware-details.md) | [Immersive Headsets](immersive-headset-hardware-details.md) | Demonstration |
 |-----|-----|-----|-----|
@@ -40,16 +59,6 @@ The goal of your application every iteration in the loop above is ultimately to 
 <span style="color:red">
 Diagram of lifetime of an app
  </span>
-
-How WMR see's it's environment
--> Talk about tracking cameras
--> show depth cloud
--> Link to deep dive
-
-How WMR derives it's position & orientation
--> WMR looks to identify visual features in it's environment
--> Calculate difference in point cloud (technical deep dive)?
--> Link to deep dive
 
 Tracking Cameras Input
 -> Hands/gestures
