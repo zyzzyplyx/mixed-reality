@@ -10,13 +10,15 @@ keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR, Perform
 
 # Advanced Performance Recommendations
 
-This article deep dives into topics to optimize performance of your Mixed Reality app to ensure you hit target frame rate. User experience can be greatly degraded if your application does not run at optimal frame rate.
-
-<span style="color:red"> Need to link to unity development overview to ensure environment set up correctly </span>
+This article deep dives into topics to optimize performance of your Mixed Reality app to ensure you hit target frame rate. User experience can be greatly degraded if your application does not run at optimal frame rate. For review, the performant framerate values for each target platform are listed below.
 
 >[!NOTE]
-> Read [Critical Concepts to Ensure Optimal User Experience](ensure-optimal-user-experience.md) to get further information on what is frame rate and it's significance to your app development.
+> If your application is not meeting frame rate as outlined below, before reviewing these advanced recommendations, ensure you > have set-up your development environment to get easy performance wins. 
 >
+> - [Critical Concepts to Ensure Optimal User Experience](ensure-optimal-user-experience.md)
+> - [Unity development overview](unity-development-overview.md)
+>
+> Further, for direction on how to measure your application's framerate, please review
 > <span style="color:red"> Reference MRTK start here/FPS display to calculate frame rate </span>
 
 | Platform | Target Frame Rate |
@@ -40,7 +42,24 @@ If your app has an underperforming framerate, the first step is to analyze and u
 
 ## How to Analyze Your Application
 
+There are a list of tools that allow you as a developer to understand the performance profile of your Mixed Reality application. These will enable you to both target where you have bottlenecks and how they are manifesting themselves to debug them. Most HoloLens applications will be GPU bounded.
+
+There is one simple test to quickly determine if you are likely GPU bounded or CPU bounded in your application. If you decrease the resolution of the render target output, there are less pixels to calculate and thus, less work the GPU needs to perform to render an image.
+
+Thus, after decreasing rendering resolution, if:
+1) Application framerate **increases**, then you are likely **GPU Bounded**
+1) Application framerate **decreases**, then you are likely **CPU Bounded**
+
+Unity provides the ability to easily modify the render target resolution of your application at runtime through the *[XRSettings.renderViewportScale](https://docs.unity3d.com/ScriptReference/XR.XRSettings-renderViewportScale.html)* property. NOTE: The final image presented on device has a fixed resolution. The platform will sample the lower resolution output to build a higher resolution image for rendering on displays. 
+
+```CS
+UnityEngine.XR.XRSettings.renderScale = 0.7f;
+```
+
+List of tools
 <span style="color:red"> Need to outline how to determine bottle neck and fill rate and stuff, brief intros to useful per tools</span>
+
+To figure this out, you may try decreasing the viewport scaling factor. If that improves your framerate, then you are likely GPU bound. Conversely, if decreasing the viewport does not improve your FPS, then you are likely CPU bound. Viewport scaling (dynamic resolution scaling) is the practice of rendering your image to a smaller render target then your output device can display, and sampling from those pixels to display your final image. It trades visual fidelity for speed. Windows Mixed Reality devices support viewport scaling at a platform level. This means if you set the viewport to be smaller (in Unity: UnityEngine.XR.XRSettings.renderViewportScale = 0.7f) Unity will inform the platform it is rendering to a smaller section of the render target, and the platform will composite its display from that smaller section of the render target.
 
 >[!NOTE]
 > Make note that most Mixed Reality apps are GPU-bounded when rendering pixels. This does not apply to every application though and thus it is recommended to use the tools & techniques above to get to ground-truth for your particular app. 

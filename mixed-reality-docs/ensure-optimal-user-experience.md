@@ -46,6 +46,8 @@ For holograms to appear stable in the world, each image presented to the user mu
 
 #### Motion sickness
 
+<span style="color:red">Finish section</span>
+
 >[!NOTE]
 > <span style="color:red">Download this app to see this symptoms for yourself (WC)</span>
 
