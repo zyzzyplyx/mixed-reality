@@ -61,8 +61,10 @@ List of tools
 
 To figure this out, you may try decreasing the viewport scaling factor. If that improves your framerate, then you are likely GPU bound. Conversely, if decreasing the viewport does not improve your FPS, then you are likely CPU bound. Viewport scaling (dynamic resolution scaling) is the practice of rendering your image to a smaller render target then your output device can display, and sampling from those pixels to display your final image. It trades visual fidelity for speed. Windows Mixed Reality devices support viewport scaling at a platform level. This means if you set the viewport to be smaller (in Unity: UnityEngine.XR.XRSettings.renderViewportScale = 0.7f) Unity will inform the platform it is rendering to a smaller section of the render target, and the platform will composite its display from that smaller section of the render target.
 
+<span style="color:red">
 >[!NOTE]
 > Make note that most Mixed Reality apps are GPU-bounded when rendering pixels. This does not apply to every application though and thus it is recommended to use the tools & techniques above to get to ground-truth for your particular app. 
+</span>
 
 ## How to Fix Your Application
 
