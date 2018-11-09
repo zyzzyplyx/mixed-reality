@@ -13,7 +13,7 @@ keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR, Perform
 This article deep dives into topics to optimize performance of your Mixed Reality app to ensure you hit target frame rate. User experience can be greatly degraded if your application does not run at optimal frame rate. For review, the performant framerate values for each target platform are listed below.
 
 >[!NOTE]
-> If your application is not meeting frame rate as outlined below, before reviewing these advanced recommendations, ensure you > have set-up your development environment to get easy performance wins. 
+> If your application is not meeting frame rate as outlined below, before reviewing these advanced recommendations, ensure you > have set-up your development environment to get easy performance wins.
 >
 > - [Critical Concepts to Ensure Optimal User Experience](ensure-optimal-user-experience.md)
 > - [Unity development overview](unity-development-overview.md)
@@ -44,6 +44,10 @@ If your app has an underperforming framerate, the first step is to analyze and u
 
 There are a list of tools that allow you as a developer to understand the performance profile of your Mixed Reality application. These will enable you to both target where you have bottlenecks and how they are manifesting themselves to debug them. Most HoloLens applications will be GPU bounded.
 
+<span style="color:red">
+Consider simplifying this with link below on Unity profiler(ms spent on CPU & GPU)
+</span>
+
 There is one simple test to quickly determine if you are likely GPU bounded or CPU bounded in your application. If you decrease the resolution of the render target output, there are less pixels to calculate and thus, less work the GPU needs to perform to render an image.
 
 Thus, after decreasing rendering resolution, if:
@@ -56,10 +60,12 @@ Unity provides the ability to easily modify the render target resolution of your
 UnityEngine.XR.XRSettings.renderScale = 0.7f;
 ```
 
+https://unity3d.com/learn/tutorials/temas/performance-optimization/diagnosing-performance-problems-using-profiler-window
+
 List of tools
 <span style="color:red"> Need to outline how to determine bottle neck and fill rate and stuff, brief intros to useful per tools</span>
 
-To figure this out, you may try decreasing the viewport scaling factor. If that improves your framerate, then you are likely GPU bound. Conversely, if decreasing the viewport does not improve your FPS, then you are likely CPU bound. Viewport scaling (dynamic resolution scaling) is the practice of rendering your image to a smaller render target then your output device can display, and sampling from those pixels to display your final image. It trades visual fidelity for speed. Windows Mixed Reality devices support viewport scaling at a platform level. This means if you set the viewport to be smaller (in Unity: UnityEngine.XR.XRSettings.renderViewportScale = 0.7f) Unity will inform the platform it is rendering to a smaller section of the render target, and the platform will composite its display from that smaller section of the render target.
+Viewport scaling (dynamic resolution scaling) is the practice of rendering your image to a smaller render target then your output device can display, and sampling from those pixels to display your final image. 
 
 <span style="color:red">
 >[!NOTE]
@@ -265,7 +271,7 @@ Read *Static Batching* under [Draw Call Batching in Unity](https://docs.unity3d.
 
 #### Dynamic Batching
 
-Since it is problematic to mark objects as *Static* for HoloLens development, dynamic batching can be a great tool to compensate for this lacking feature. Of course, it is can also be useful on immersive headsets as well. Dynamic batching in Unity can be difficult though to enable because GameObjects must **a) share the same Material** and **b) meet a long list of other criteria**. 
+Since it is problematic to mark objects as *Static* for HoloLens development, dynamic batching can be a great tool to compensate for this lacking feature. Of course, it is can also be useful on immersive headsets as well. Dynamic batching in Unity can be difficult though to enable because GameObjects must **a) share the same Material** and **b) meet a long list of other criteria**.
 
 Read *Dynamic Batching* under [Draw Call Batching in Unity](https://docs.unity3d.com/Manual/DrawCallBatching.html) for the full list. Most commonly, GameObjects become invalid to be batched dynamically because the associated mesh data can be no more than 300 vertices.
 
@@ -281,20 +287,51 @@ Further, it is generally preferable to combine meshes into one GameObject where 
 ### GPU Performance Recommendations
 
 #### Understand Bandwidth vs Fill Rate
+When rendering a frame on the GPU, an application is generally either bounded my memory bandwidth or fill rate
 
+- **Memory bandwidth** is the rate of reads and writes the GPU can perform from memory
+    - To identify bandwidth limitations, reduce texture quality and check if framerate improved. In Unity, this can be done by changing Texture Quality in **Edit** > **Project Settings** > **[Quality Settings](https://docs.unity3d.com/Manual/class-QualitySettings.html)**.
+- **Fill rate** refers to the throughput of rendered pixels that can be drawn per second by the GPU.
+    - To identify fill rate limitations, decrease the display resolution and check if framerate improved. In Unity, this can be done via <span style="red">combine with up above?</span>
+
+<span style="color:red">
 Talk about stuff*
+</span>
 
 #### General
 
-- Reduce poly count -> LOD System
-- Limit overdraw
-- MSAA
-- Post Effects
+##### Reduce Poly Count
+Higher polygon counts result in more operations for the GPU and reducing the number of polygons in your scene will reduce the amount of time to render that geometry. There are other factors involved as well in shading the geometry that can still be expensive but polygon count is the base metric to determine how expensive a scene will be to render. 
+
+Polygon count is usually reduced by either
+1) Removing objects from a scene
+2) Asset decimation which reduces the number of polygon for a given object
+3) Implementing a [Level of Detail (LOD) System](https://docs.unity3d.com/Manual/LevelOfDetail.html) into your application which renders far away objects with lower-polygon version of the geometry
+
+##### Single pass Instanced Rendering
+
+<span style="color:red"> FILL IN AREA HERE </span>
+
+##### Limit overdraw
+
+High overdraw occurs when multiple objects are rendered but not outputted to the screen as they are hidden by another object. Imagine looking at a wall that had multiple rooms and geometry behind it. All of the geometry would be processed for rendering but only the opaque wall really needs to be rendered as it occludes the view of all other content. This results in wasteful operations that are not needed for the current view.
+
+In Unity, one can view overdraw for their scene, by toggling the [**draw mode menu**](https://docs.unity3d.com/Manual/ViewModes.html) in the top left corner of the scene view and selecting **Overdraw**.
+
+Generally, overdraw can be mitigated by culling objects ahead of time before they are sent to the GPU. Unity provides details on implementing [Occlusion Culling](https://docs.unity3d.com/Manual/OcclusionCulling.html) in their engine. 
+
+##### Remove or limit post-processing effects
+Post-processing effects can be very expensive and generally inhibit the fill rate of your application. This also includes anti-aliasing techniques such as MSAA. On HoloLens, it is recommended to avoid these techniques entirely. 
+
+<span style="color:red">
 - Sub-pixel triangles are very expensive.
 - HoloLens => Avoid Geometry, Hull and Compute Shaders.
-- Single pass Instanced Rendering
+https://unity3d.com/learn/tutorials/temas/performance-optimization/optimizing-graphics-rendering-unity-games
+</span>
 
 #### Shaders
+
+how you draw
 
 How to get shader stats ouptut
 Use bilinear whenever possible.
@@ -303,13 +340,27 @@ And of course, precalculate as much as you can on the CPU and pass as constants 
 
 ### Memory Recommendations
 
-#### Avoid Allocations
-sdfsdf
+Excessive memory allocation & deallocation operations can have adverse effects on your holographic application resulting in inconsistent performance, frozen frames, and other detrimental behavior. It is particullary important to understand memory considerations when developing in Unity since memory management is controlled by the garbage collector.
+
+#### Garbage Collection
+
+Holographic apps will loose processing compute time to the garbage collector when the GC is activated to analyze objects that are no longer in scope during execution and their memory needs to be released so it can be made available for re-use. Constant allocations and de-allocations will generally require the garbage collector to run more frequently thus hurting performance and user experience.
+
+Unity has provided an excellent page that explains in detail how the garbage collector works and tips to write more efficient code in regards to memory management.
+- [Optimizing garbage collection in Unity games](https://unity3d.com/learn/tutorials/topics/performance-optimization/optimizing-garbage-collection-unity-games?playlist=44069)
+
+One of the most common practices that leads to excessive garbage collection is not caching references to components and classes in Unity development. Any references should be captured during Start() or Awake() and re-used in later functions such as Update() or LateUpdate().
+
+Other quick tips:
+- Use the [StringBuilder](https://docs.microsoft.com/en-us/dotnet/api/system.text.stringbuilder?view=netframework-4.7.2) C# class to dynamically build complex strings at runtime
+- Remove calls to Debug.Log() when no longer needed as they still execute in all build versions of an app
+- If your holographic app generally requires lots of memory, consider calling  [_**System.GC.Collect()**_](https://docs.microsoft.com/en-us/dotnet/api/system.gc.collect?view=netframework-4.7.2) during loading phases such as when presenting a loading or transition screen
 
 #### Object Pooling
-sdfsdf
 
-#### Garbage Collections
+Ojbect pooling is a popular technique to reduce the cost of continuous allocations & deallocations of objects. This is done by allocating a large pool of an identical objects and re-using inactive, available instances from this pool instead of constantly spawning and destroying objects over time. Object pools are great for re-useable components that have variable lifetime during an app.
+
+- [[Unity] Object Pooling Tutorial](https://unity3d.com/learn/tutorials/topics/scripting/object-pooling) 
 
 ### Startup Performance
 
@@ -318,4 +369,8 @@ You should consider starting your app with a smaller scene, then using SceneMana
 Remember that while the startup scene is loading the holographic splash screen will be displayed to the user.
 
 ## See Also
+- [Optimizing graphics rendering in Unity games](https://unity3d.com/learn/tutorials/temas/performance-optimization/optimizing-graphics-rendering-unity-games?playlist=44069)
+- [Optimizing garbage collection in Unity games](https://unity3d.com/learn/tutorials/topics/performance-optimization/optimizing-garbage-collection-unity-games?playlist=44069)
+- [[Unity] Physics Best Practices](https://unity3d.com/learn/tutorials/topics/physics/physics-best-practices)
+- [[Unity] Optimizing Scripts](https://docs.unity3d.com/Manual/MobileOptimizationPracticalScriptingOptimizations.html?_ga=2.184268192.743151652.1541786540-1257165747.1521494484)
 <span style="color:red"> Insert links here </span>
