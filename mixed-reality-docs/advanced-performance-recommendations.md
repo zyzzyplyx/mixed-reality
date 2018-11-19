@@ -12,80 +12,81 @@ keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR, Perform
 
 This article deep dives into topics to optimize performance of your Mixed Reality app to ensure you hit target frame rate. User experience can be greatly degraded if your application does not run at optimal frame rate. For review, the performant framerate values for each target platform are listed below.
 
->[!NOTE]
-> If your application is not meeting frame rate as outlined below, before reviewing these advanced recommendations, ensure you > have set-up your development environment to get easy performance wins.
->
-> - [Critical Concepts to Ensure Optimal User Experience](ensure-optimal-user-experience.md)
-> - [Unity development overview](unity-development-overview.md)
->
-> Further, for direction on how to measure your application's framerate, please review
-> <span style="color:red"> Reference MRTK start here/FPS display to calculate frame rate </span>
-
 | Platform | Target Frame Rate |
 |----------|-------------------|
 | [HoloLens](hololens-hardware-details.md) | 60 FPS |
 | [Windows Mixed Reality Ultra PCs](immersive-headset-hardware-details.md) | 90 FPS |
 | [Windows Mixed Reality PCs](immersive-headset-hardware-details.md) | 60 FPS |
 
+>[!NOTE]
+> If your application is not meeting frame rate as outlined below, before reviewing details on this page, ensure you have set-up your development environment for best performance wins.
+>
+> - [Critical Concepts to Ensure Optimal User Experience](ensure-optimal-user-experience.md)
+> - [Unity development overview](unity-development-overview.md)
+>
+> For direction on how to measure your application's framerate, please review this [section](ensure-optimal-user-experience.md#measure-your-frame-rate)
+
 # Understanding Performance Bottlenecks
 
-If your app has an underperforming framerate, the first step is to analyze and understand where your application is computationally intensive. There are two primary processors responsible for the work to render your scene: the CPU and the GPU. Each of these two components handle different operations and stages of your Mixed Reality app. There are three key places where bottlenecks may occur.
+If your app has an underperforming framerate, the first step is to analyze and understand where your application is computationally intensive. There are two primary processors responsible for the work to render your scene: the CPU and the GPU. Each of these two components handle different operations and stages of your Mixed Reality app. There are three key places where bottlenecks may occur. 
 
-<span style="color:red"> Useful to have diagram here </span>
-
-1. App Thread - CPU
+1. **App Thread - CPU**
     * This thread is responsible for your app logic. This includes processing input, animations, physics, and other app logic/state
-2. Render Thread - CPU to GPU
-    * This thread is responsible for submitting your draw calls to the GPU. When your app wants to render an object such as a cube or model, this thread sends a request to the GPU, which has an architecture optimized for rendering, to perform these operations. 
-3. GPU
-    * This processor most commonly handles the graphics pipeline of your application to transform 3D data (models, textures, etc) into pixels and ultimately produce a 2D image to submit to your device's screen
+2. **Render Thread - CPU to GPU**
+    * This thread is responsible for submitting your draw calls to the GPU. When your app wants to render an object such as a cube or model, this thread sends a request to the GPU, which has an architecture optimized for rendering, to perform these operations.
+3. **GPU**
+    * This processor most commonly handles the graphics pipeline of your application to transform 3D data (models, textures, etc) into pixels and ultimately produce a 2D image to submit to your device's screen.
 
-## How to Analyze Your Application
+![Lifetime of a Frame](images/lifetime-of-a-frame.jpg)
 
-There are a list of tools that allow you as a developer to understand the performance profile of your Mixed Reality application. These will enable you to both target where you have bottlenecks and how they are manifesting themselves to debug them. Most HoloLens applications will be GPU bounded.
+Generally, HoloLens applications will be GPU bounded. However, this does not hold true in every application and thus it is recommended to use the tools & techniques below to get to ground-truth for your particular app.
 
-<span style="color:red">
-Consider simplifying this with link below on Unity profiler(ms spent on CPU & GPU)
-</span>
+## How to analyze your application
 
-There is one simple test to quickly determine if you are likely GPU bounded or CPU bounded in your application. If you decrease the resolution of the render target output, there are less pixels to calculate and thus, less work the GPU needs to perform to render an image.
+There are a list of tools that allow you as a developer to understand the performance profile of your Mixed Reality application. These will enable you to both target where you have bottlenecks and how they are manifesting themselves to debug them.
+
+### How to profile with Unity
+
+Unity provides the **[Unity Profiler](https://docs.unity3d.com/Manual/Profiler.html)** built-in which is a great resource to gather valuable performance insights for your particular app. Although one can run the profiler in-editor, these metrics do not represent the true runtime environment and thus, results from this should be used cautiously. It is recommended to remotely profile your application while running on device for most accurate and actionable insights.
+
+Unity provides great documentation for:
+1) How to connect the [Unity profiler to UWP applications remotely](https://docs.unity3d.com/Manual/windowsstore-profiler.html)
+2) How to effectively [diagnose performance problems with the Unity Profiler](https://unity3d.com/learn/tutorials/temas/performance-optimization/diagnosing-performance-problems-using-profiler-window)
+
+>[!NOTE]
+> With the Unity Profiler connected and after adding the GPU profiler (see *Add Profiler* in top right corner), one can see how much time is being spent on the CPU & GPU respectively in the middle of the profiler. This allows the developer to get a quick approximation if their application is CPU or GPU bounded.
+>
+> ![Unity CPU vs GPU](images/unity-profiler-cpu-gpu.png)
+
+### Platform agnostic profiling
+
+There is one simple test to quickly determine if you are likely GPU bounded or CPU bounded in your application. If you decrease the resolution of the render target output, there are less pixels to calculate and thus, less work the GPU needs to perform to render an image. Viewport scaling (dynamic resolution scaling) is the practice of rendering your image to a smaller render target then your output device can display, and sampling from those pixels to display your final image.
 
 Thus, after decreasing rendering resolution, if:
 1) Application framerate **increases**, then you are likely **GPU Bounded**
-1) Application framerate **decreases**, then you are likely **CPU Bounded**
+1) Application framerate **unchanged**, then you are likely **CPU Bounded**
 
-Unity provides the ability to easily modify the render target resolution of your application at runtime through the *[XRSettings.renderViewportScale](https://docs.unity3d.com/ScriptReference/XR.XRSettings-renderViewportScale.html)* property. NOTE: The final image presented on device has a fixed resolution. The platform will sample the lower resolution output to build a higher resolution image for rendering on displays. 
-
-```CS
-UnityEngine.XR.XRSettings.renderScale = 0.7f;
-```
-
-https://unity3d.com/learn/tutorials/temas/performance-optimization/diagnosing-performance-problems-using-profiler-window
-
-List of tools
-<span style="color:red"> Need to outline how to determine bottle neck and fill rate and stuff, brief intros to useful per tools</span>
-
-Viewport scaling (dynamic resolution scaling) is the practice of rendering your image to a smaller render target then your output device can display, and sampling from those pixels to display your final image. 
-
-<span style="color:red">
 >[!NOTE]
-> Make note that most Mixed Reality apps are GPU-bounded when rendering pixels. This does not apply to every application though and thus it is recommended to use the tools & techniques above to get to ground-truth for your particular app. 
-</span>
+>Unity provides the ability to easily modify the render target resolution of your application at runtime through the *[XRSettings.renderViewportScale](https://docs.unity3d.com/ScriptReference/XR.XRSettings-renderViewportScale.html)* property. The final image presented on device has a fixed resolution. The platform will sample the lower resolution output to build a higher resolution image for rendering on displays. 
+>
+>```CS
+>UnityEngine.XR.XRSettings.renderScale = 0.7f;
+>```
 
-## How to Fix Your Application
+### Additional performance tools
 
-Point out that you should use <span style="color:red"> blah </span> tools to determine where your application is performing expensive computations but here is a list of best practices and useful insights. 
+- [Intel Graphics Performance Analyzers](https://software.intel.com/gpa)
+- [Visual Studio Graphics Debuggers](https://docs.microsoft.com/en-us/visualstudio/debugger/graphics/visual-studio-graphics-diagnostics?view=vs-2017)
+- [Unity Frame Debugger](https://docs.unity3d.com/Manual/FrameDebugger.html)
 
-<span style="color:red"> Need to link to unity development overview to ensure environment set up correctly </span>
+## How to improve your application
 
 **Table of Contents:**
 * [CPU](#CPU-Performance-Recommendations)
 * [CPU to GPU](#CPU-to-GPU-Performance-Recommendations)
 * [GPU](#GPU-Performance-Recommendations)
 * [Memory](#Memory-Recommendations)
-* <span style="color:red"> Startup Performance?
-* <span style="color:red"> Additional References/links/etc
-* <span style="color:red">Power => Make separate page
+* [Startup Performance](#Startup-performance)
 
 ### CPU Performance Recommendations
 
@@ -246,9 +247,11 @@ Unity has a great article that gives an overview and dives into batching draw ca
 
 #### Single Pass Instanced Rendering
 
-Single Pass Instanced Rendering in Unity allows XR applications draw calls for each eye to be reduced down to one instanced draw call. Due to cache coherency between two draw calls, there is also some performance improvement on the GPU as well. 
+Single Pass Instanced Rendering in Unity allows XR applications draw calls for each eye to be reduced down to one instanced draw call. Due to cache coherency between two draw calls, there is also some performance improvement on the GPU as well.
 
-To enable this feature, open **Player Settings** (go to Edit > Project Settings > Player). In Player Settings, navigate to **XR Settings** at the bottom, check the **Virtual Reality Supported** box, then select **Single Pass Instanced (Preview)** from the Stereo Rendering Method drop-down menu.
+To enable this feature in your Unity Project
+1)  Open **Player Settings** (go to **Edit** > **Project Settings** > Player > **Universal Windows Platform tab** > **XR Settings**)
+2) Select **Single Pass Instanced (Preview)** from the **Stereo Rendering Method** drop-down menu (**Virtual Reality Supported** should already be checked)
 
 <span style="color:red"> Can we copy & credit images from unity?
 https://blogs.unity3d.com/2017/11/21/how-to-maximize-ar-and-vr-performance-with-advanced-stereo-rendering/>
@@ -259,13 +262,13 @@ Read the following articles from Unity for details with this rendering approach.
 - [Single Pass Instancing](https://docs.unity3d.com/Manual/SinglePassInstancing.html) 
 
 >[!NOTE]
-> One common issue with Single Pass Instanced Rendering occurs if developers already have existing custom shaders not written for instancing. After enabling this feature, developers may notice some GameObjects only render in one eye. This is because the associated custom shaders do not have the appropriate properties for instancing 
+> One common issue with Single Pass Instanced Rendering occurs if developers already have existing custom shaders not written for instancing. After enabling this feature, developers may notice some GameObjects only render in one eye. This is because the associated custom shaders do not have the appropriate properties for instancing.
 >
 > See [Single Pass Stereo Rendering for HoloLens](https://docs.unity3d.com/Manual/SinglePassStereoRenderingHoloLens.html) from Unity for how to address this problem
 
 #### Static Batching
 
-Static Batching works for most Renderer objects in Unity that **1) share the same material** and **2) are all marked as *Static*** (Select an object in Unity and click the checkbox in the top right of the inspector). GameObjects marked as *Static* cannot be moved throughout your application's runtime. Thus, static batching can be difficult to leverage on HoloLens where virtually every object needs to be placed, moved, scaled, etc. For immersive headsets, static batching can dramatically reduce draw calls and thus improve performance.
+Static Batching works for most [Renderer](https://docs.unity3d.com/ScriptReference/Renderer.html) objects in Unity that **1) share the same material** and **2) are all marked as *Static*** (Select an object in Unity and click the checkbox in the top right of the inspector). GameObjects marked as *Static* cannot be moved throughout your application's runtime. Thus, static batching can be difficult to leverage on HoloLens where virtually every object needs to be placed, moved, scaled, etc. For immersive headsets, static batching can dramatically reduce draw calls and thus improve performance.
 
 Read *Static Batching* under [Draw Call Batching in Unity](https://docs.unity3d.com/Manual/DrawCallBatching.html) for more details.
 
@@ -281,7 +284,7 @@ Batching can only occur if multiple GameObjects are able to share the same mater
 
 Further, it is generally preferable to combine meshes into one GameObject where possible and reasonable. Each Renderer in Unity will have it's associated draw call(s) versus submitting a combined mesh under one Renderer. 
 
->[!NOTE] 
+>[!NOTE]
 > Modifying properties of Renderer.material at runtime will create a copy of the Material and thus potentially break batching. Use Renderer.sharedMaterial to modify shared material properties across GameObjects.
 
 ### GPU Performance Recommendations
@@ -300,17 +303,13 @@ Talk about stuff*
 
 #### General
 
-##### Reduce Poly Count
+##### Reduce poly count
 Higher polygon counts result in more operations for the GPU and reducing the number of polygons in your scene will reduce the amount of time to render that geometry. There are other factors involved as well in shading the geometry that can still be expensive but polygon count is the base metric to determine how expensive a scene will be to render. 
 
 Polygon count is usually reduced by either
 1) Removing objects from a scene
 2) Asset decimation which reduces the number of polygon for a given object
 3) Implementing a [Level of Detail (LOD) System](https://docs.unity3d.com/Manual/LevelOfDetail.html) into your application which renders far away objects with lower-polygon version of the geometry
-
-##### Single pass Instanced Rendering
-
-<span style="color:red"> FILL IN AREA HERE </span>
 
 ##### Limit overdraw
 
@@ -331,18 +330,19 @@ https://unity3d.com/learn/tutorials/temas/performance-optimization/optimizing-gr
 
 #### Shaders
 
+<span style="color:red">
 how you draw
-
 How to get shader stats ouptut
+</span><br/>
 Use bilinear whenever possible.
 such as trying to rearrange expressions to use the mad intrinsics in order to do a multiply and an add at the same time.
 And of course, precalculate as much as you can on the CPU and pass as constants to the material. Whenever that isn't possible, do as much as you can in the vertex shader. Even for things that vary per-pixel you can sometimes get away with doing parts of the calculation in the vertex shader.
 
-### Memory Recommendations
+### Memory recommendations
 
 Excessive memory allocation & deallocation operations can have adverse effects on your holographic application resulting in inconsistent performance, frozen frames, and other detrimental behavior. It is particullary important to understand memory considerations when developing in Unity since memory management is controlled by the garbage collector.
 
-#### Garbage Collection
+#### Garbage collection
 
 Holographic apps will loose processing compute time to the garbage collector when the GC is activated to analyze objects that are no longer in scope during execution and their memory needs to be released so it can be made available for re-use. Constant allocations and de-allocations will generally require the garbage collector to run more frequently thus hurting performance and user experience.
 
@@ -356,15 +356,15 @@ Other quick tips:
 - Remove calls to Debug.Log() when no longer needed as they still execute in all build versions of an app
 - If your holographic app generally requires lots of memory, consider calling  [_**System.GC.Collect()**_](https://docs.microsoft.com/en-us/dotnet/api/system.gc.collect?view=netframework-4.7.2) during loading phases such as when presenting a loading or transition screen
 
-#### Object Pooling
+#### Object pooling
 
 Ojbect pooling is a popular technique to reduce the cost of continuous allocations & deallocations of objects. This is done by allocating a large pool of an identical objects and re-using inactive, available instances from this pool instead of constantly spawning and destroying objects over time. Object pools are great for re-useable components that have variable lifetime during an app.
 
 - [[Unity] Object Pooling Tutorial](https://unity3d.com/learn/tutorials/topics/scripting/object-pooling) 
 
-### Startup Performance
+### Startup performance
 
-You should consider starting your app with a smaller scene, then using SceneManager.LoadSceneAsync to load the rest of the scene. This allows your app to get to an interactive state as fast as possible. Be aware that there may be a large CPU spike while the new scene is being activated and that any rendered content might stutter or hitch. One way to work around this is to set the AsyncOperation.allowSceneActivation property to false on the scene being loaded, wait for the scene to load, clear the screen to black, and then set back to true to complete the scene activation.
+You should consider starting your app with a smaller scene, then using *[SceneManager.LoadSceneAsync](https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.LoadSceneAsync.html)* to load the rest of the scene. This allows your app to get to an interactive state as fast as possible. Be aware that there may be a large CPU spike while the new scene is being activated and that any rendered content might stutter or hitch. One way to work around this is to set the AsyncOperation.allowSceneActivation property to false on the scene being loaded, wait for the scene to load, clear the screen to black, and then set back to true to complete the scene activation.
 
 Remember that while the startup scene is loading the holographic splash screen will be displayed to the user.
 
@@ -373,4 +373,3 @@ Remember that while the startup scene is loading the holographic splash screen w
 - [Optimizing garbage collection in Unity games](https://unity3d.com/learn/tutorials/topics/performance-optimization/optimizing-garbage-collection-unity-games?playlist=44069)
 - [[Unity] Physics Best Practices](https://unity3d.com/learn/tutorials/topics/physics/physics-best-practices)
 - [[Unity] Optimizing Scripts](https://docs.unity3d.com/Manual/MobileOptimizationPracticalScriptingOptimizations.html?_ga=2.184268192.743151652.1541786540-1257165747.1521494484)
-<span style="color:red"> Insert links here </span>

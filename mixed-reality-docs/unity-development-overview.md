@@ -8,40 +8,6 @@ ms.topic: article
 keywords: Unity, mixed reality, development, getting started, new project, porting, capability, camera, simulation, emulation, documentation
 ---
 
-
-Porting -> Porting Guide
-Reference MRTK Start Here Project for setup
-Manual Unity Setup -> Replaces Unity Recommended Settings
-
-Explain -> Goal is to setup development to 
-1) Work within WMR
-2) Run performantly 
-
-What is the goal?<br/>
-	Road to 60 or system FPS intro
-	Bullet point benefits, links to detailed info
-	Step 1 -> Add FPS prefab into scene
-
-Unity Settings<br/>
-	Low quality
-	Single-pass instanced Rendering
-
-Shader:<br/>
-	Unity Standard Shader
-	MRTK Standard Shader
-	Other useful shaders (Lambert, vertex lit) (Move operations from Pixel shader to vertex shader)
-o	How to get operation count in Unity
-
-Hologram Stability: <br/>
-	Stabilization Plane (Both)
-	Anchoring (Hololens)
-o	Spatial Anchors
-o	World Anchors
-
-Application Builds<br/>
-	Debug/Release/Master
-
-
 # Unity development overview
 
 The fastest path to building a [mixed reality app](app-views.md) is with [Unity](http://aka.ms/HoloLensUnity). We recommend you take the time to explore the [Unity tutorials](https://unity3d.com/learn/tutorials). If you need assets, Unity has a comprehensive [Asset Store](https://www.assetstore.unity3d.com/). Once you have built up a basic understanding of Unity, you can visit the [Mixed Reality Academy](academy.md) to learn the specifics of mixed reality development with Unity. Be sure to visit the [Unity Mixed Reality forums](http://forum.unity3d.com/forums/hololens.102/) to engage with the rest of the community building mixed reality apps in Unity and find solutions to problems you might run into.
@@ -52,76 +18,77 @@ If you have an existing Unity project that you're porting to Windows Mixed Reali
 
 ## Configuring a new Unity project for Windows Mixed Reality
 
-To get started building mixed reality apps with Unity, first [install the tools](install-the-tools.md). If you'll be targeting Windows Mixed Reality immersive headsets rather than HoloLens, you'll need a special version of Unity for now.
+To get started building mixed reality apps with Unity, first [install the tools](install-the-tools.md).
 
-If you've just created a new Unity project, there are a small set of Unity settings you'll need to change for Windows Mixed Reality, broken down into two categories: per-project and per-scene.
+After installing the necessary tools, the easiest way to set-up a new Windows Mixed Reality project in Unity is to utilize the **[Mixed Reality Toolkit for Unity](https://github.com/Microsoft/MixedRealityToolkit-Unity)**. 
 
-### Per-project settings
+After importing the *.unitypackage for MRTK into your project, you will find a new *"Mixed Reality Toolkit"* tab at the top of Unity. Under this tab, a developer has two options to allow MRTK to auto-setup your Unity environment. The "Apply Mixed Reality Project SettingsS" tool will modify project-wide configurations while the "Mixed Reality Scene Settings" will need to be utilized per scene. These tools will enable XR in Unity, initialize MRTK components such as input manager, modify the camera GameObject to function correctly for mixed reality, and more.
 
-To target Windows Mixed Reality, you first need to set your Unity project to export as a Universal Windows Platform app:
-1. Select **File > Build Settings...**
-2. Select **Universal Windows Platform** in the Platform list and click **Switch Platform**
-3. Set **SDK** to **Universal 10**
-4. Set **Target device** to **Any Device** to support immersive headsets or switch to **HoloLens**
-5. Set **Build Type** to **D3D**
-6. Set **UWP SDK** to **Latest installed**
+If so desired, [this guide](manual-unity-environment-set-up.md) will also walkthrough the manual process for configuring a Unity project for Windows Mixed Reality.
 
-We then need to let Unity know that the app we are trying to export should create an [immersive view](app-views.md) instead of a 2D view. We do that by enabling "Virtual Reality Supported":
-1. From the **Build Settings...** window, open **Player Settings...**
-2. Select the **Settings for Universal Windows Platform** tab
-3. Expand the **XR Settings** group
-4. In the **XR Settings** section, check the **Virtual Reality Supported** checkbox to add the **Virtual Reality Devices** list.
-5. In the **XR Settings** group, confirm that **"Windows Mixed Reality"** is listed as a supported device. (this may appear as "Windows Holographic" in older versions of Unity)
+- **Mixed Reality Toolkit** > **Configure** > **Apply Mixed Reality Project Settings**
+- **Mixed Reality Toolkit** > **Configure** > **Apply Mixed Reality Scene Settings**
 
-Your app can now do basic holographic rendering and spatial input. To go further and take advantage of certain functionality, your app must declare the appropriate capabilities in its manifest. The manifest declarations can be made in Unity so they are included in every subsequent project export. The setting are found in **Player Settings > Settings for Universal Windows Platform > Publishing Settings > Capabilities**. The applicable capabilities for enabling commonly-used Unity APIs for Mixed Reality are:
+![MRTK Unity Configure](images/mrtk-configure-unity.png)
 
-|  Capability  |  APIs requiring capability | 
-|----------|----------|
-|  SpatialPerception  |  SurfaceObserver (access to [spatial mapping](spatial-mapping.md) meshes on HoloLens)&mdash;*No capability needed for general spatial tracking of the headset* | 
-|  WebCam  |  PhotoCapture and VideoCapture | 
-|  PicturesLibrary / VideosLibrary  |  PhotoCapture or VideoCapture, respectively (when storing the captured content) | 
-|  Microphone  |  VideoCapture (when capturing audio), DictationRecognizer, GrammarRecognizer, and KeywordRecognizer | 
-|  InternetClient  |  DictationRecognizer (and to use the Unity Profiler) | 
+After MRTK has automated the process to correctly configure your Unity project & scenes to run Windows Mixed Reality, there are three other important settings that are highly recommended.
 
-**Unity quality settings**
+### Framerate counter
 
-![Unity quality settings](images/unityqualitysettings-350px.png)<br>
-*Unity quality settings*
+It is vital that developers and creators keep track of their framerate throughout the entire development process. Thus, we recommend adding a visual counter to your application during environment set-up.
 
-HoloLens has a mobile-class GPU. If your app is targeting HoloLens, you'll want the quality settings tuned for fastest performance to ensure we maintain full framerate:
-1. Select **Edit > Project Settings > Quality**
-2. Select the **dropdown** under the **Windows Store** logo and select **Fastest**. You'll know the setting is applied correctly when the box in the Windows Store column and **Fastest** row is green.
+A framerate counter can easily be enabled in Unity with the [Mixed Reality Toolkit for Unity](https://github.com/Microsoft/MixedRealityToolkit-Unity).
 
-### Per-scene settings
+1) Import the MRTK *.unitypackage into your project
+2) Search in your *Project Window* for **"FPSDisplay.prefab"**
+3) Drag this prefab into your scene
 
-**Unity camera settings**
+To learn more about framerate, see [Critical Concepts to Ensure Optimal User Experience](ensure-optimal-user-experience.md)
 
-![Unity camera settings](images/unitycamerasettings.png)<br>
-*Unity camera settings*
+### Single Pass Instanced Rendering
 
-Once you enable the "Virtual Reality Supported" checkbox, the [Unity Camera](camera-in-unity.md) component handles [head tracking and stereoscopic rendering](rendering.md). There is no need to replace it with a custom camera to do this.
+Single Pass Instanced Rendering in Unity allows XR applications to reduce and optimizes the draw operations needed for each eye. Turning this feature ON will optimize the rendering pipeline in Unity to save on both CPU and GPU performance for Mixed Reality projects.
 
-If your app is targeting HoloLens specifically, there are a few settings that need to be changed to optimize for the device's transparent displays, so your app will show through to the physical world:
-1. In the **Hierarchy**, select the **Main Camera**
-2. In the **Inspector** panel, set the transform **position** to **0, 0, 0** so the location of the users head starts at the Unity world origin.
-3. Change **Clear Flags** to **Solid Color**.
-4. Change the **Background** color to **RGBA 0,0,0,0**. Black renders as transparent in HoloLens.
-5. Change **Clipping Planes - Near** to the [HoloLens recommended](camera-in-unity.md#clip-planes) 0.85 (meters).
+Read the following articles from Unity for details with this rendering approach.
+- [How to maximize AR and VR performance with advanced stereo rendering](https://blogs.unity3d.com/2017/11/21/how-to-maximize-ar-and-vr-performance-with-advanced-stereo-rendering/)
+- [Single Pass Instancing](https://docs.unity3d.com/Manual/SinglePassInstancing.html) 
 
-If you delete and create a new camera, make sure your camera is **Tagged** as **MainCamera**.
+To enable this feature in your Unity Project
+1)  Open **Player Settings** (go to **Edit** > **Project Settings** > Player > **Universal Windows Platform tab** > **XR Settings**)
+2) Select **Single Pass Instanced (Preview)** from the **Stereo Rendering Method** drop-down menu (**Virtual Reality Supported** should already be checked)
 
-## Adding mixed reality capabilities and inputs
+>[!NOTE]
+> One common issue with Single Pass Instanced Rendering occurs if developers already have existing custom shaders not written for instancing. After enabling this feature, developers may notice some GameObjects only render in one eye. This is because the associated custom shaders do not have the appropriate properties for instancing.
+>
+> See [Single Pass Stereo Rendering for HoloLens](https://docs.unity3d.com/Manual/SinglePassStereoRenderingHoloLens.html) from Unity for how to address this problem
 
-Once you've configured your project as described above, standard Unity game objects (such as the camera) will light up immediately for a **seated-scale experience**, with the camera's position updated automatically as the user moves their head through the world.
+### Enable Depth Buffer Sharing
 
-Adding support for Windows Mixed Reality features such as [spatial stages](coordinate-systems.md#spatial-coordinate-systems), [gestures, motion controllers](gestures-and-motion-controllers-in-unity.md) or [voice input](voice-input-in-unity.md) is achieved using APIs built directly into Unity.
+The depth buffer for each frame of your application contains depth data for all the scene geometry currently in view from the camera when the application is running. Each pixel of a depth buffer provides a distance to the closest geometry along a ray from that pixel. Sharing this data with the Windows Mixed Reality platform can enhance user experience by improving hologram stability.
 
-Your first step should be to review the [experience scales](coordinate-systems.md) that your app can target:
-* If you're looking to build an **orientation-only** or **seated-scale experience**, you'll need to set Unity's tracking space type to [Stationary](coordinate-systems-in-unity.md#building-an-orientation-only-or-seated-scale-experience).
-* If you're looking to build a **standing-scale** or **room-scale experience**, you'll need to ensure Unity's tracking space type is successfully set to [RoomScale](coordinate-systems-in-unity.md#building-an-orientation-only-or-seated-scale-experience).
-* If you're looking to build a **world-scale** experience on HoloLens, letting users roam beyond 5 meters, you'll need to use the [WorldAnchor](coordinate-systems-in-unity.md#building-a-world-scale-experience) component.
+To set whether your Unity app will provide a depth buffer to Windows:
 
-All of the core building blocks for mixed reality apps are exposed in a manner consistent with other Unity APIs:
+1)  Open **Player Settings** (go to **Edit** > **Project Settings** > Player > **Universal Windows Platform tab** > **XR Settings**)
+2) Expand the **Windows Mixed Reality SDK** item under **Virtual Reality SDKs**.
+3) Check the **Enable Depth Buffer Sharing** box. 
+
+>[!NOTE]
+> The **Depth Format** next to the **Enable Depth Buffer Sharing** check box determines the level of precision for each pixel in your depth buffer. There are two options available: 16-bit and 24-bit. The 16-bit option will generally improve performance for your application but the lower fidelity may result in [Z-fighting](https://en.wikipedia.org/wiki/Z-fighting) between geometry in your scene. Z-fighting occurs when two pieces of geometry have similar or identical z-values in the depth buffer and the system cannot accurately determine which object is actually closer to the user. This generally results in a flickering and pixelated blending effect between the two pieces of geometry. If an application experiences [Z-fighting](https://en.wikipedia.org/wiki/Z-fighting), two options to resolve this issue are:
+> 1) Reduce the difference in the near & far clipping plane values on the [Unity camera](https://docs.unity3d.com/Manual/class-Camera.html). Narrowing this range will allow greater precision while still using the 16-bit configuration
+> 2) Switch from 16-bit depth buffer format to 24-bit depth buffer format
+
+## Optimal Windows Mixed Reality user experience
+
+There are many features that the Windows Mixed Reality platform provides to build powerful, interactive holographic apps. However, there are some critical concepts to understand to ensure user's have an optimal experience. Of most important note is understanding the significance of application framerate and the necessary tools to ensure stable holograms. It is recommended to review the topics below. 
+
+- [Critical Concepts to Ensure Optimal User Experience](ensure-optimal-user-experience.md)
+- [Performance Recommendations](advanced-performance-recommendations.md)
+
+## Windows Mixed Reality features in Unity
+
+To get started learning how to use Windows Mixed Reality platforms features & functionality, it is recommended to review the [Mixed Reality Academy](academy.md). The Academy has a rich list of tutorials and walkthroughs for how to get started incorporating key features into your holographic application.
+
+Further, developers can learn more on the core building blocks for mixed reality apps in Unity via the dedicated sections below.
 * [Camera](camera-in-unity.md)
 * [Coordinate systems](coordinate-systems-in-unity.md)
 * [Gaze](gaze-in-unity.md)
@@ -142,7 +109,7 @@ There are other key features that many mixed reality apps will want to use, whic
 
 Once you've got your holographic Unity project ready to test out, your next step is to [export and build a Unity Visual Studio solution](exporting-and-building-a-unity-visual-studio-solution.md).
 
-With that VS solution in hand, you can then run your app in one of three ways, using either a real or simulated device:
+With that Visual Studio solution in hand, you can then run your app in one of three ways, using either a real or simulated device:
 * [Deploy to a real HoloLens or Windows Mixed Reality immersive headset](using-visual-studio.md)
 * [Deploy to the HoloLens emulator](using-the-hololens-emulator.md)
 * [Deploy to the Windows Mixed Reality immersive headset simulator](using-the-windows-mixed-reality-simulator.md)
@@ -160,7 +127,7 @@ In addition to this documentation available on the Windows Dev Center, Unity ins
 ## See also
 * [MR Basics 100: Getting started with Unity](holograms-100.md)
 * [Recommended settings for Unity](recommended-settings-for-unity.md)
-* [Performance recommendations for Unity](performance-recommendations-for-unity.md)
+* [Performance Recommendations](advanced-performance-recommendations.md)
 * [Exporting and building a Unity Visual Studio solution](exporting-and-building-a-unity-visual-studio-solution.md)
 * [Using the Windows namespace with Unity apps for HoloLens](using-the-windows-namespace-with-unity-apps-for-hololens.md)
 * [Best practices for working with Unity and Visual Studio](best-practices-for-working-with-unity-and-visual-studio.md)

@@ -82,10 +82,9 @@ The end-to-end process of creating an image though takes time. If an application
 |-----|-----|-----|-----|
 | **Head Tracking** <br> Windows Mixed Reality devices can track where a user is located in their physical space and in what orientation they are looking. <br><span style="color:red"> HEAD TRACKING LINK HERE </span> | ✔️ | ✔️ | ![test-gif](test/test-gif.gif) |
 | **[Spatial Mapping](spatial-mapping.md)** <br> sdfsdf <br> [Spatial Mapping design](spatial-mapping-design.md) \| [Spatial mapping in Development](spatial-mapping-in-unity.md) | ✔️ |   | ![Spatial Mapping](images/surfacereconstruction.jpg) |
-| **Spatial Understanding** <br>  <br>  | ✔️ |   | ![test-gif](test/test-gif.gif) |
+| **Spatial Understanding** <br>  <br>  | ✔️ |   | <span style="color:red">INSERT</span> |
 | **[Gaze](gaze.md)** <br> The user's pose, or where they are gazing, can be a powerful tool to allow for richer input and interact with your application scene. <br> [Gaze Design](gaze-targeting.md) \| [Gaze Development](gaze-in-unity.md) | ✔️ | ✔️ | ![test-gif](images/useriscamera-640px.jpg) |
 | **[Gestures](gestures.md)** <br> Hand gestures allow HoloLens users a model to drive action and interaction in an application<br> [Gestures Development](gestures-and-motion-controllers-in-unity.md) | ✔️ |  | ![Gesture Example](images/bloom-giphy.gif) |
 | **[Motion Controllers](motion-controllers.md)** <br> Motion Controllers are the complement for gestures on Hololens to immersive headsets. Users leverage motion controllers as a tool to "touch" and interact with objects <br> [Motion Controllers Development](gestures-and-motion-controllers-in-unity.md) |  | ✔️ | ![Motion Controllers](images/winmr-ck-1080x1080-350px.jpg) |
 | **[Voice Input](voice-input.md)** <br> The Windows Mixed Reality platform can recognize voice keywords to enable users to directly command holograms and activity in an app.<br> [Voice design](voice-design.md) \| [Voice Input Development](voice-input-in-unity.md) | ✔️ | ✔️ | ![Voice Input](images/voice.gif) |
 | **[Spatial Audio](spatial-sound.md)** <br> Windows Mixed Reality simulates 3D sound to ensure users gain dimension and depth in their Mixed Reality world. <br> [Spatial Sound Design](spatial-sound-design.md) \| [Spatial Sound Development](spatial-sound-in-unity.md) | ✔️ | ✔️ | ![Spatial Audio](images/spatialaudio.gif) |
-

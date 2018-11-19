@@ -41,7 +41,7 @@ For holograms to appear stable in the world, each image presented to the user mu
 
 Further, a user’s head is constantly moving and rotating over time, even if every so slightly. The user's head position will be different before and after rendering a frame. The Windows Mixed Reality platform will make predictions of where the user's view will be at the end of the frame. Additionally, the platform will perform Late-Stage Reprojection (LSR) <span style="color:red">(Hyperlink needed)</span> which adjusts the rendered image to account for the discrepancy between the predicted head position and the actual head position.
 
-The error for predicting final head position will be greater for longer rendering times. The image adjustment process of LSR also works best for small discrepencies in point of view. The reprojection will be less effective for lower framerates. 
+The error for predicting final head position will be greater for longer rendering times. The image adjustment process of LSR also works best for small discrepancies in point of view. The reprojection will be less effective for lower framerates.
 
 Lower framerate applications thus will have less effective positioning and stability of holograms being rendered to the user, resulting in a negative user experience. 
 
@@ -51,16 +51,14 @@ Unstable holograms and inaccurate position tracking will give misleading rendere
 
 <span style="color:red">Finish section</span>
 
->[!NOTE]
-> <span style="color:red">Download this app to see this symptoms for yourself (WC)</span>
-
-### How can I measure my application’s frame rate?
+### Measure your frame rate
 It is vital that developers and creators keep track of their framerate throughout the entire development process. Thus, we recommend adding a visual counter to your application during environment set-up. 
 
 A framerate counter can easily be enabled in Unity with [Mixed Reality Toolkit for Unity](https://github.com/Microsoft/MixedRealityToolkit-Unity). 
 
-1) Search in your *Project Window* for **"FPSDisplay.prefab"**
-2) Drag this prefab into your scene
+1) Import the MRTK *.unitypackage into your project
+2) Search in your *Project Window* for **"FPSDisplay.prefab"**
+3) Drag this prefab into your scene
 
 <span style="color:red">{GIF: Show example of FPS indicator in head locked display}</span>
 
