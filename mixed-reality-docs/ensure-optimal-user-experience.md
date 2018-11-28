@@ -10,14 +10,22 @@ keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR
 
 # Critical Concepts to Ensure Optimal User Experience
 
+Unlike traditional programming, holographic development has unique challenges to solve and configurations to optimize. This article will introduce valuable development concepts that when applied correctly can greatly improve tracking and hologram stability in a mixed reality application. Similar to how laggy video or high-latency network performance can degrade user experience, poor tracking and holographic rendering deteriorates the overall quality of an application.
+
+Applications that do not properly configure the following will likely receive feedback from customers that the experience suffers from "jitter", "judder", "drift", "jumpiness" and other similar issues. On HoloLens, these issues will generally be even more pronounced.
+
+- [Frame Rate](#why-does-frame-rate-matter?)
+- [Late-Stage Reprojection (Immersive Headsets & Hololens)](#late-stage-reprojection-immersive-headsets--hololens)
+- [Anchoring (HoloLens Only)](#anchoring-hololens-only)
+- [Device Calibration](#device-calibration)
+- [Interpupillary Distance (IPD)](#interpupillary-distance-ipd)
+
 ## Frame Rate
 
 *Frame rate*, also known as FPS (Frames per second), is **one of the most critical indicators** that determines how optimal your application’s user experience will be.
 
 ### What is Frame Rate?
-Frame rate is a metric equal to the number of times per second your app can present an image to the user in their device. 
-
-<span style="color:red">{Show gif here, 1 FPS, 5 FPS, 10 FPS, 30 FPS, 60 FPS}</span>
+Frame rate is a metric equal to the number of times per second your app can present an image to the user in their device.
 
 Developers need to ensure their applications meet the target framerate that is determined by the type of device running the app. See the table below for frame rates on your targeted device endpoint.
 
@@ -29,27 +37,16 @@ Developers need to ensure their applications meet the target framerate that is d
 
 ### Why does frame rate matter?
 
-Applications that do not meet the target value for their device endpoint will suffer the following symptoms. The severity of the problems below are correlated as worse with lower frame rate values and less impactful (WC) with higher frame rate values.
-
-#### Device Pose Tracking 
-Your application will receive less accurate positioning and orientation for where the user is located and looking in their environment. 
-<span style="color:red">Finish section</span>
-
-#### Hologram Stability
+Applications that do not meet the target value for their device endpoint will suffer from the following:
+1) Inaccurate head tracking
+2) Unstable and incorrectly drawn holograms
+3) Potential user motion sickness
 
 For holograms to appear stable in the world, each image presented to the user must have the holograms drawn in the correct spot. Rendering an image for your application takes time. With a target frame rate of 60 FPS, this equates to about 16 milliseconds. At 30FPS, this delay doubles to ~33 ms and effectively the same image is shown twice to the user, compared to rendering at 60 FPS. This longer delay can result in uneven motion and double images of holograms which will manifest to the user as judder.
 
-Further, a user’s head is constantly moving and rotating over time, even if every so slightly. The user's head position will be different before and after rendering a frame. The Windows Mixed Reality platform will make predictions of where the user's view will be at the end of the frame. Additionally, the platform will perform Late-Stage Reprojection (LSR) <span style="color:red">(Hyperlink needed)</span> which adjusts the rendered image to account for the discrepancy between the predicted head position and the actual head position.
+Further, a user’s head is constantly moving and rotating over time, even if every so slightly. The user's head position will be different before and after rendering a frame. The Windows Mixed Reality platform will make predictions of where the user's view will be at the end of the frame. Additionally, the platform will perform Late-Stage Reprojection (LSR) which adjusts the rendered image to account for the discrepancy between the predicted head position and the actual head position.
 
-The error for predicting final head position will be greater for longer rendering times. The image adjustment process of LSR also works best for small discrepancies in point of view. The reprojection will be less effective for lower framerates.
-
-Lower framerate applications thus will have less effective positioning and stability of holograms being rendered to the user, resulting in a negative user experience. 
-
-#### Motion sickness
-
-Unstable holograms and inaccurate position tracking will give misleading rendered results to the user relative to their actual movements. This can induce motion sickness. 
-
-<span style="color:red">Finish section</span>
+However, the error for predicting final head position will be greater for longer rendering times. Lower framerate applications thus will have less effective positioning and stability of holograms being rendered to the user, resulting in a negative user experience.
 
 ### Measure your frame rate
 It is vital that developers and creators keep track of their framerate throughout the entire development process. Thus, we recommend adding a visual counter to your application during environment set-up. 
@@ -71,24 +68,10 @@ A framerate counter can easily be enabled in Unity with [Mixed Reality Toolkit f
 >* [Unity development overview](unity-development-overview.md)
 >* [Advanced Performance Recommendations](advanced-performance-recommendations.md)
 
-## Hologram Stability
-
-As noted in the previous section, applications with low frame rates will suffer from unstable and incorrectly drawn holograms. However, there are other important settings and components to be cognizant of during development to ensure optimal tracking and display of your scene
-
-Unlike traditional programming, holographic applications require various configurations to be properly set in order to ensure a smooth and stable user experience. Failure to set up your application appropriately may result in experience with accuracy misalignment, jitter, judder, drift, jumpiness, etc. This is particularly more problematic on HoloLens.
-
-<span style="color:red"> { INSERT GIF OF SWIMMING OR OTHER BAD EXPERIENCE } </span>
-
-- [Consistent 60 FPS](#why-does-frame-rate-matter?)
-- [Late-Stage Reprojection (Immersive Headsets & Hololens)](#late-stage-reprojection-immersive-headsets--hololens)
-- [Anchoring (HoloLens Only)](#anchoring-hololens-only)
-- [Device Calibration](#device-calibration)
-- [Interpupillary Distance (IPD)](#interpupillary-distance-ipd)
-
 ### Late-Stage Reprojection (Immersive Headsets & Hololens)
-As mentioned in the Frame Rate section above, Windows Mixed reality devices has hardware that adjusts the rendered image from your app to account for the discrepancy between the predicted head position and the actual head position.
+Windows Mixed reality devices have technology that adjusts the rendered image from a running holographic application to account for the discrepancy between the predicted head position and the actual head position.
 
-To help the platform best stabilize holograms, developers can share their application's depth buffer with Windows. 
+To help the platform best stabilize holograms, developers can share their application's depth buffer with Windows.
 
 - For **[Immersive Headsets](immersive-headset-hardware-details.md)**, the platform will utilize the depth buffer to perform per-pixel depth-based reprojection. 
 - For **[HoloLens](hololens-hardware-details.md)**, the depth buffer can be used to find a [focus point](focus-point-in-unity.md) to optimize hologram stability through a stabilization plane. 
@@ -110,7 +93,9 @@ If you are writing an application with DirectX, read [Rendering in DirectX](rend
 
 ### Anchoring (HoloLens Only)
 
-HoloLens is constantly scanning and reasoning the current environment via <span style="color:red"> head tracking</span>. The device keeps track of multiple [coordinate systems](coordinate-systems.md) and their relationship to one another based on prominent features identified in the physical space. The platform abstracts much of these calculations so that developers only have to worry about the [coordinate system in Unity](coordinate-systems-in-unity.md). 
+HoloLens is constantly scanning and reasoning the current environment via multiple environment understand and tracking cameras on device (see image below). The device keeps track of several [coordinate systems](coordinate-systems.md) and their relationship to one another based on prominent features identified in the physical space. The platform abstracts much of these calculations so that developers only have to worry about the [coordinate system in Unity](coordinate-systems-in-unity.md).
+
+![Environment Understand Cameras](images/sensor-bar-400px.jpg)
 
 >[!NOTE]
 > The initial position of the user in the physical world when a Unity holographic app starts will become the origin (i.e <0,0,0\>) in the Unity coordinate system. Further, the user's initial head orientation will become Unity's world Z-forward(+) > axis , which will correspondingly make the X-axis orthogonal to the initial orientation.
@@ -118,7 +103,7 @@ HoloLens is constantly scanning and reasoning the current environment via <span 
 
 **[Anchoring](spatial-anchors.md)** is a special concept whereby the developer can indicate to the HoloLens that a specific spot in space is of interest to their app experience. If a hologram should be _**anchored**_ to a particular point in physical space, you can attach a [WorldAnchor](https://docs.unity3d.com/2017.4/Documentation/ScriptReference/XR.WSA.WorldAnchor.html) component in Unity to the GameObject that should remain stable at one position. This will allow the platform to take over control of this GameObject's transform to ensure accurate positioning during app runtime.
 
-To learn more about how Anchor's work and best practices when using them, please read [Spatial anchors](spatial-anchors.md).
+To learn more about how anchor's work and best practices when using them, please read [Spatial anchors](spatial-anchors.md).
 
 >[!NOTE]
 > Spatial Anchors and World Anchors are one in the same. Unity describes an Anchor as a [WorldAnchor](https://docs.unity3d.com/2017.4/Documentation/ScriptReference/XR.WSA.WorldAnchor.html) component while the exact concept is known as a [Spatial Anchor](https://docs.microsoft.com/en-us/uwp/api/windows.perception.spatial.spatialanchor) in the Windows Mixed Reality API. 

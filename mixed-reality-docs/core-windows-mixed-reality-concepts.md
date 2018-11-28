@@ -10,7 +10,7 @@ keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR
 
 # Core Windows Mixed Reality Concepts
 
-<span style="color:red">insert intro speel</span>
+This article will introduce key understandings for developing with Windows Mixed Reality for building spatial applications. These concepts enable developers to build innovative experiences and help address many of the difficulties and challenges associated with developing mixed reality applications. 
 
 ## Understanding reality
 
@@ -40,8 +40,6 @@ Since devices can understand where a user is positioned and in which direction t
 
 ![test-gif](images/useriscamera-640px.jpg)
 
-<span style="color:red"> Insert pic</span>
-
 ### [Gestures](gestures.md) and [Motion controllers](motion-controllers.md)
 
 Users want to touch and nimbly control their Mixed Reality environment. Gestures and motion controllers are the primary means for users to interact with their *hands* in your application. Which you as a developer leverage depends on the device endpoint being targeted. Gestures are used for HoloLens devices and Motion Controllers function in Immersive Headsets. 
@@ -69,10 +67,13 @@ Mixed Reality applications behave very similarly to game runtime dynamics. Your 
 
 The ultimate goal of your application every iteration in this loop is to calculate an image to present to the user. In order to do this correctly, the Windows Mixed Reality platform provides accurate input information to your app to ensure your scene is rendered correctly. Further, the Windows Mixed Reality platform has to track various inputs and make them available to your application.
 
-The end-to-end process of creating an image though takes time. If an application runs at 60 frames-per-second, which means 60 images are rendered and presented to the user per second, then an application is finishing an image every 16.6 milliseconds. 
+The end-to-end process of creating an image though takes time. If an application runs at 60 frames-per-second, which means 60 images are rendered and presented to the user per second, then an application is finishing an image every 16.6 milliseconds.
 
-<span style="color:red">Need to talk about head pose prediction & LSR</span>
-<span style="color:red">Links to where to read more about this</span>
+As noted below, the Windows Mixed Reality platform provides multiple prediction for where the current user is located and where they are looking. Further, the platform will perform a process known as Late-Stage Reprojection (LSR) that adjusts the final rendered image for the current camera prediction before presenting on device.
+
+Multiple pose predictions are provided over time because a user's head will move, even if ever so slightly, throughout this entire time period from CPU to device present. This process is largely abstracted in development environments such as Unity.
+
+However, it is important to understand that, unlike traditional development, the user is the camera and how the Windows Mixed Reality platform handles solving these special problems.
 
 ![Lifetime of a frame](images/lifetime-of-a-frame.jpg)
 
@@ -82,9 +83,13 @@ The end-to-end process of creating an image though takes time. If an application
 |-----|-----|-----|-----|
 | **Head Tracking** <br> Windows Mixed Reality devices can track where a user is located in their physical space and in what orientation they are looking. <br><span style="color:red"> HEAD TRACKING LINK HERE </span> | ✔️ | ✔️ | ![test-gif](test/test-gif.gif) |
 | **[Spatial Mapping](spatial-mapping.md)** <br> sdfsdf <br> [Spatial Mapping design](spatial-mapping-design.md) \| [Spatial mapping in Development](spatial-mapping-in-unity.md) | ✔️ |   | ![Spatial Mapping](images/surfacereconstruction.jpg) |
-| **Spatial Understanding** <br>  <br>  | ✔️ |   | <span style="color:red">INSERT</span> |
 | **[Gaze](gaze.md)** <br> The user's pose, or where they are gazing, can be a powerful tool to allow for richer input and interact with your application scene. <br> [Gaze Design](gaze-targeting.md) \| [Gaze Development](gaze-in-unity.md) | ✔️ | ✔️ | ![test-gif](images/useriscamera-640px.jpg) |
 | **[Gestures](gestures.md)** <br> Hand gestures allow HoloLens users a model to drive action and interaction in an application<br> [Gestures Development](gestures-and-motion-controllers-in-unity.md) | ✔️ |  | ![Gesture Example](images/bloom-giphy.gif) |
 | **[Motion Controllers](motion-controllers.md)** <br> Motion Controllers are the complement for gestures on Hololens to immersive headsets. Users leverage motion controllers as a tool to "touch" and interact with objects <br> [Motion Controllers Development](gestures-and-motion-controllers-in-unity.md) |  | ✔️ | ![Motion Controllers](images/winmr-ck-1080x1080-350px.jpg) |
 | **[Voice Input](voice-input.md)** <br> The Windows Mixed Reality platform can recognize voice keywords to enable users to directly command holograms and activity in an app.<br> [Voice design](voice-design.md) \| [Voice Input Development](voice-input-in-unity.md) | ✔️ | ✔️ | ![Voice Input](images/voice.gif) |
 | **[Spatial Audio](spatial-sound.md)** <br> Windows Mixed Reality simulates 3D sound to ensure users gain dimension and depth in their Mixed Reality world. <br> [Spatial Sound Design](spatial-sound-design.md) \| [Spatial Sound Development](spatial-sound-in-unity.md) | ✔️ | ✔️ | ![Spatial Audio](images/spatialaudio.gif) |
+
+## See Also
+- [Critical Concepts to Ensure Optimal User Experience](ensure-optimal-user-experience.md)
+- [Hologram stability](hologram-stability.md)
+- [Unity development overview](unity-development-overview.md)

@@ -90,6 +90,14 @@ Thus, after decreasing rendering resolution, if:
 
 ### CPU Performance Recommendations
 
+<span style="color:red"> 
+need to call out principales & platform agnoistic things
+</span>
+
+<span style="color:red"> Note?
+Avoid interfaces and virtual methods in hot code such as inner loops. Interfaces in particular are much slower than a direct call. Virtual functions are not as bad, but still significantly slower than a direct call.
+</span>
+
 #### Cache References
 
 It is best practice to cache references to all relevant components and GameObjects at initialization. This is because repeating function calls such as *[GetComponent\<T>()](https://docs.unity3d.com/ScriptReference/GameObject.GetComponent.html)* are significantly more expensive relative to the memory cost to store a pointer. This also applies to to the very, regularly used [Camera.main](https://docs.unity3d.com/ScriptReference/Camera-main.html). *Camera.main* actually just uses *[FindGameObjectsWithTag()](https://docs.unity3d.com/ScriptReference/GameObject.FindGameObjectsWithTag.html)* underneath which expensively searches your scene graph for a camera object with the *"MainCamera"* tag.
@@ -168,13 +176,11 @@ public class ExampleClass : MonoBehaviour
 
 3) **Beware of Boxing**
 
-    A common case for that is passing structs to a method that takes an interface as a parameter. Instead, make the method take the concrete type (by ref) so that it can be passed without allocation.
-
-    <span style="color:red"> CLEAN HERE </span>
+    [Boxing](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing) is a core concept of the C# language and runtime. It is the process of wrapping value-typed variables such as char, int, bool, etc. into reference-typed variables. When a value-typed variable is "boxed", it is wrapped inside of a System.Object which is stored on the managed heap. Thus, memory is allocated and eventually when disposed must be processed by the garbage collector. These allocations and deallocations incur a performance cost and in many scenarios are unnecessary or can be easily replaced by a less expensive alternative.
 
 #### Repeating Code Paths
 
-Any repeating Unity callbacks function that are executed many times per second and/or frame should be written very carefully. Any expensive operations here will have huge and consistent impact on performance. 
+Any repeating Unity callbacks function that are executed many times per second and/or frame should be written very carefully. Any expensive operations here will have huge and consistent impact on performance.
 
 1) **Empty Callback Functions**
 
@@ -188,10 +194,6 @@ Any repeating Unity callbacks function that are executed many times per second a
 
 >[!NOTE]
 > Update() is the most common manifestation of this performance issue but other repeating Unity callbacks such as the following can be equally as bad if not worse: FixedUpdate(), LateUpdate(), OnPostRender", OnPreRender(), OnRenderImage(), etc. 
-
-<span style="color:red"> Note?
-If you have a lot of objects in the scene and/or scripts that do heavy processing, avoid having Update functions on every object in your scene. Instead, have just a few higher level "manager" objects with Update functions that calls into any other objects that need attention. The specifics of using this approach is highly application-dependent, but you can often skip large numbers of objects at once using higher level logic. For example, AI logic code probably doesn't need to update every single frame, so you could instead store them all in an array and have a higher level manager object update only a small number of them per fr
-</span>
 
 2) **Common, Expensive Operations**
 
@@ -209,10 +211,6 @@ If you have a lot of objects in the scene and/or scripts that do heavy processin
     c) It is good practice to instantiate all objects, if possible, at initialization and use [object pooling](#object-pooling) to recycle and re-use GameObjects throughout runtime of your application
 
         UnityEngine.Object.Instantiate()
-
-<span style="color:red"> Note?
-Avoid interfaces and virtual methods in hot code such as inner loops. Interfaces in particular are much slower than a direct call. Virtual functions are not as bad, but still significantly slower than a direct call.
-</span>
 
 #### Miscellaneous
 
@@ -252,10 +250,6 @@ Single Pass Instanced Rendering in Unity allows XR applications draw calls for e
 To enable this feature in your Unity Project
 1)  Open **Player Settings** (go to **Edit** > **Project Settings** > Player > **Universal Windows Platform tab** > **XR Settings**)
 2) Select **Single Pass Instanced (Preview)** from the **Stereo Rendering Method** drop-down menu (**Virtual Reality Supported** should already be checked)
-
-<span style="color:red"> Can we copy & credit images from unity?
-https://blogs.unity3d.com/2017/11/21/how-to-maximize-ar-and-vr-performance-with-advanced-stereo-rendering/>
-</span>
 
 Read the following articles from Unity for details with this rendering approach.
 - [How to maximize AR and VR performance with advanced stereo rendering](https://blogs.unity3d.com/2017/11/21/how-to-maximize-ar-and-vr-performance-with-advanced-stereo-rendering/)
@@ -371,5 +365,5 @@ Remember that while the startup scene is loading the holographic splash screen w
 ## See Also
 - [Optimizing graphics rendering in Unity games](https://unity3d.com/learn/tutorials/temas/performance-optimization/optimizing-graphics-rendering-unity-games?playlist=44069)
 - [Optimizing garbage collection in Unity games](https://unity3d.com/learn/tutorials/topics/performance-optimization/optimizing-garbage-collection-unity-games?playlist=44069)
-- [[Unity] Physics Best Practices](https://unity3d.com/learn/tutorials/topics/physics/physics-best-practices)
-- [[Unity] Optimizing Scripts](https://docs.unity3d.com/Manual/MobileOptimizationPracticalScriptingOptimizations.html?_ga=2.184268192.743151652.1541786540-1257165747.1521494484)
+- [Physics Best Practices [Unity]](https://unity3d.com/learn/tutorials/topics/physics/physics-best-practices)
+- [Optimizing Scripts [Unity]](https://docs.unity3d.com/Manual/MobileOptimizationPracticalScriptingOptimizations.html?_ga=2.184268192.743151652.1541786540-1257165747.1521494484)
