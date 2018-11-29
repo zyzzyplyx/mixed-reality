@@ -49,7 +49,7 @@ Further, a user’s head is constantly moving and rotating over time, even if ev
 However, the error for predicting final head position will be greater for longer rendering times. Lower framerate applications thus will have less effective positioning and stability of holograms being rendered to the user, resulting in a negative user experience.
 
 ### Measure your frame rate
-It is vital that developers and creators keep track of their framerate throughout the entire development process. Thus, we recommend adding a visual counter to your application during environment set-up. 
+It is vital that developers and creators keep track of their framerate throughout the entire development process. Thus, we recommend adding a visual counter to your application during environment set-up.
 
 A framerate counter can easily be enabled in Unity with [Mixed Reality Toolkit for Unity](https://github.com/Microsoft/MixedRealityToolkit-Unity). 
 
@@ -68,7 +68,7 @@ A framerate counter can easily be enabled in Unity with [Mixed Reality Toolkit f
 >* [Unity development overview](unity-development-overview.md)
 >* [Advanced Performance Recommendations](advanced-performance-recommendations.md)
 
-### Late-Stage Reprojection (Immersive Headsets & Hololens)
+### Late-Stage reprojection (Immersive Headsets & Hololens)
 Windows Mixed reality devices have technology that adjusts the rendered image from a running holographic application to account for the discrepancy between the predicted head position and the actual head position.
 
 To help the platform best stabilize holograms, developers can share their application's depth buffer with Windows.
@@ -91,7 +91,7 @@ If you are writing an application with DirectX, read [Rendering in DirectX](rend
 > 2) Enable the **View Options** > **Show Stabilization Plane** checkbox
 > 3) Confirm the rendered plane in the main window tracks correctly with your gaze
 
-### Anchoring (HoloLens Only)
+### Anchoring (HoloLens only)
 
 HoloLens is constantly scanning and reasoning the current environment via multiple environment understand and tracking cameras on device (see image below). The device keeps track of several [coordinate systems](coordinate-systems.md) and their relationship to one another based on prominent features identified in the physical space. The platform abstracts much of these calculations so that developers only have to worry about the [coordinate system in Unity](coordinate-systems-in-unity.md).
 
@@ -110,16 +110,15 @@ To learn more about how anchor's work and best practices when using them, please
 > 
 > If writing a holographic app in DirectX, [read this guidance](coordinate-systems-in-directx.md#place-holograms-in-the-world-using-spatial-anchors) on using the [Spatial Anchor](https://docs.microsoft.com/en-us/uwp/api/windows.perception.spatial.spatialanchor) class.
 
-### Device Calibration
+### Device calibration
 
 <span style="color:red"> CREATE CONTENT </span>
 
-### Interpupillary Distance (IPD)
+### Interpupillary distance (IPD)
 
-<span style="color:red"> Need graphic here 
+Mixed reality devices render two images, one for each eye of the user. To render each, two different camera parameters are used as the location of each eye is separated over a distance. The distance in millimeters between the center of the user's pupils when looking straight ahead is a user's Interpupillary distance or IPD. This value has to be calculated per user. It is important to set the correct IPD for each user as incorrect values will render a scene from the wrong perspective. Thus, users will see misalignment in placement of holograms.
 
-Explain what IPD is. how to set it in WebB or via API
-</span>
+To learn more about setting IPD, read the [Calibration](calibration.md) page. The IPD setting for a device can also be set remotely via the [Device Portal](using-the-windows-device-portal.md#device-portal-pages)
 
 ## See Also
 - [Hologram stability](hologram-stability.md)
