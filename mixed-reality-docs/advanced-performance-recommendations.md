@@ -8,7 +8,7 @@ ms.topic: article
 keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR, Performance, Optimization, CPU, GPU
 ---
 
-# Advanced Performance Recommendations
+# Advanced performance recommendations
 
 This article deep dives into topics to optimize performance of your Mixed Reality app to ensure you hit target frame rate. User experience can be greatly degraded if your application does not run at optimal frame rate. For review, the performant framerate values for each target platform are listed below.
 
@@ -26,7 +26,7 @@ This article deep dives into topics to optimize performance of your Mixed Realit
 >
 > For direction on how to measure your application's framerate, please review this [section](ensure-optimal-user-experience.md#measure-your-frame-rate)
 
-# Understanding Performance Bottlenecks
+# Understanding performance bottlenecks
 
 If your app has an underperforming framerate, the first step is to analyze and understand where your application is computationally intensive. There are two primary processors responsible for the work to render your scene: the CPU and the GPU. Each of these two components handle different operations and stages of your Mixed Reality app. There are three key places where bottlenecks may occur. 
 
@@ -58,7 +58,7 @@ Unity provides great documentation for:
 >
 > ![Unity CPU vs GPU](images/unity-profiler-cpu-gpu.png)
 
-### Platform agnostic profiling
+### How to profile in any environment
 
 There is one simple test to quickly determine if you are likely GPU bounded or CPU bounded in your application. If you decrease the resolution of the render target output, there are less pixels to calculate and thus, less work the GPU needs to perform to render an image. Viewport scaling (dynamic resolution scaling) is the practice of rendering your image to a smaller render target then your output device can display, and sampling from those pixels to display your final image.
 
@@ -88,17 +88,18 @@ Thus, after decreasing rendering resolution, if:
 * [Memory](#Memory-Recommendations)
 * [Startup Performance](#Startup-performance)
 
-### CPU Performance Recommendations
+### CPU performance recommendations
 
-<span style="color:red"> 
-need to call out principales & platform agnoistic things
-</span>
+Generally, most work in a mixed reality application on the CPU involves performing the "simulation" of the scene and processing extensive unique application logic. Thus, the following areas are usually targeted for optimization.
 
-<span style="color:red"> Note?
-Avoid interfaces and virtual methods in hot code such as inner loops. Interfaces in particular are much slower than a direct call. Virtual functions are not as bad, but still significantly slower than a direct call.
-</span>
+- Animations
+- Simplify Physics
+- Memory allocations (see [Memory section](#Memory-Recommendations) below)
+- Complex algorithms (i.e inverse kinematics, path-finding,)
 
-#### Cache References
+The content below covers more in-depth performance practices, especially targeted for Unity & C# development.
+
+#### Cache references
 
 It is best practice to cache references to all relevant components and GameObjects at initialization. This is because repeating function calls such as *[GetComponent\<T>()](https://docs.unity3d.com/ScriptReference/GameObject.GetComponent.html)* are significantly more expensive relative to the memory cost to store a pointer. This also applies to to the very, regularly used [Camera.main](https://docs.unity3d.com/ScriptReference/Camera-main.html). *Camera.main* actually just uses *[FindGameObjectsWithTag()](https://docs.unity3d.com/ScriptReference/GameObject.FindGameObjectsWithTag.html)* underneath which expensively searches your scene graph for a camera object with the *"MainCamera"* tag.
 
@@ -140,7 +141,7 @@ public class ExampleClass : MonoBehaviour
 > (Good) T GetComponent\<T>() <br/>
 > (Bad) Component GetComponent(string)> <br/>
 
-#### Avoid Expensive Operations
+#### Avoid expensive operations
 
 1) **Avoid use of [LINQ](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/getting-started-with-linq)**
 
@@ -174,15 +175,15 @@ public class ExampleClass : MonoBehaviour
 >[!NOTE]
 > *[SendMessage()](https://docs.unity3d.com/ScriptReference/GameObject.SendMessage.html)* and *[BroadcastMessage()](https://docs.unity3d.com/ScriptReference/GameObject.BroadcastMessage.html)* should be eliminated at all costs. These functions can be on the order of 1000x slower than direct function calls.
 
-3) **Beware of Boxing**
+3) **Beware of boxing**
 
     [Boxing](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing) is a core concept of the C# language and runtime. It is the process of wrapping value-typed variables such as char, int, bool, etc. into reference-typed variables. When a value-typed variable is "boxed", it is wrapped inside of a System.Object which is stored on the managed heap. Thus, memory is allocated and eventually when disposed must be processed by the garbage collector. These allocations and deallocations incur a performance cost and in many scenarios are unnecessary or can be easily replaced by a less expensive alternative.
 
-#### Repeating Code Paths
+#### Repeating code paths
 
 Any repeating Unity callbacks function that are executed many times per second and/or frame should be written very carefully. Any expensive operations here will have huge and consistent impact on performance.
 
-1) **Empty Callback Functions**
+1) **Empty callback functions**
 
     Although the code below may seem innocent to leave in your application, especially since every Unity script auto-initializes with this code block, these empty callbacks can actually become very expensive. Unity operates back and forth over an unmanaged/managed code boundary, between UnityEngine code and your application code. Context switching over this bridge is fairly expensive even if there is nothing to execute. This becomes especially problematic if your app has 100's of GameObjects with components that have empty repeating Unity callbacks.
 
@@ -195,11 +196,11 @@ Any repeating Unity callbacks function that are executed many times per second a
 >[!NOTE]
 > Update() is the most common manifestation of this performance issue but other repeating Unity callbacks such as the following can be equally as bad if not worse: FixedUpdate(), LateUpdate(), OnPostRender", OnPreRender(), OnRenderImage(), etc. 
 
-2) **Common, Expensive Operations**
+2) **Operations to favor running once per frame**
 
-    The following Unity APIs are common operations almost every Holographic App. These can still readily be used to create an application with a constant 60 FPS but they need to be managed wisely.
+    The following Unity APIs are common operations almost every Holographic App. Although not always possible, the results from these functions can very commonly be computed once and the results re-utilized across the application for a given frame.
 
-    a) Generally it is good practice to have a dedicated Singleton class to handle your gaze Raycast into the scene and then re-use this result in all other scene components, instead of making repeated and essentially identical Raycast operations by each component.
+    a) Generally it is good practice to have a dedicated Singleton class to handle your gaze Raycast into the scene and then re-use this result in all other scene components, instead of making repeated and essentially identical Raycast operations by each component. Of course, some applications may require raycasts from different origins or against different [LayerMasks](https://docs.unity3d.com/ScriptReference/LayerMask.html)
 
         UnityEngine.Physics.Raycast()
         UnityEngine.Physics.RaycastAll()
@@ -212,6 +213,14 @@ Any repeating Unity callbacks function that are executed many times per second a
 
         UnityEngine.Object.Instantiate()
 
+3) **Avoid interfaces and virtual constructs**
+
+    Invoking function calls through interfaces vs direct objects or calling virtual functions can often times be much more expensive than utilizing direct constructs or direct function calls. If the virtual function or interface is unnecessary, then it should be removed. However, the performance hit for these approaches are generally worth the trade-off if utilizing them simplifies development collaboration, code readability, and code maintainability. 
+
+4) **Avoid passing structs by value**
+
+    Unlike classes, structs are value-types and when passed directly to a function, their contents are copied into a newly created instance. This copy adds CPU cost as well as additional memory on the stack. For small structs, the effect is usually very minimal and thus acceptable. However, for functions repeatedly invoked every frame as well as functions taking large structs, if possible modify the function definition to pass by reference. [Learn more here](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/how-to-know-the-difference-passing-a-struct-and-passing-a-class-to-a-method)
+
 #### Miscellaneous
 
 1) **Physics**
@@ -222,28 +231,24 @@ Any repeating Unity callbacks function that are executed many times per second a
 
         Sphere < Capsule < Box <<< Mesh (Convex) < Mesh (non-Convex)
 
-    [Unity Physics Best Practices](https://unity3d.com/learn/tutorials/topics/physics/physics-best-practices)
+    See [Unity Physics Best Practices](https://unity3d.com/learn/tutorials/topics/physics/physics-best-practices) for more info
 
 2) **Animations**
 
-    a) Simplify animations
+    Disable idle animations by disabling the Animator component (disabling the game object won't have the same effect). Avoid design patterns where an animator sits in a loop setting a value to the same thing. There is considerable overhead for this technique, with no effect on the application. [Learn more here](https://docs.unity3d.com/Manual/MecanimPeformanceandOptimization.html)
 
-    b) Disable idle animations by disabling the Animator component (disabling the game object won't have the same effect). Avoid design patterns where an animator sits in a loop setting a value to the same thing. There is considerable overhead for this technique, with no effect on the application.
-
-<span style="color:red"> FINISH ANIMATION SECTION</span>
-
-3) **Complex Algorithms**
+3) **Complex algorithms**
 
     If your application is using complex algorithms such as inverse kinematics, path finding, etc, look to find a simpler approach or adjust relevant settings for their performance
 
-### CPU-to-GPU Performance Recommendations
+### CPU-to-GPU performance recommendations
 
 Generally, CPU-to-GPU performance comes down to the **draw calls** submitted to the graphics card. To improve performance, draw calls need to be strategically **a) reduced** or **b) restructured** for optimal results. Since draw calls themselves are resource-intensive, reducing them will reduce overall work required. Further, state changes between draw calls requires costly validation and translation steps in the graphics driver and thus, restructuring of your application's draw calls to limit state changes(i.e different materials, etc) can boost performance.
 
 Unity has a great article that gives an overview and dives into batching draw calls for their platform.
 - [Unity Draw Call Batching](https://docs.unity3d.com/Manual/DrawCallBatching.html)
 
-#### Single Pass Instanced Rendering
+#### Single pass instanced rendering
 
 Single Pass Instanced Rendering in Unity allows XR applications draw calls for each eye to be reduced down to one instanced draw call. Due to cache coherency between two draw calls, there is also some performance improvement on the GPU as well.
 
@@ -260,19 +265,19 @@ Read the following articles from Unity for details with this rendering approach.
 >
 > See [Single Pass Stereo Rendering for HoloLens](https://docs.unity3d.com/Manual/SinglePassStereoRenderingHoloLens.html) from Unity for how to address this problem
 
-#### Static Batching
+#### Static batching
 
 Static Batching works for most [Renderer](https://docs.unity3d.com/ScriptReference/Renderer.html) objects in Unity that **1) share the same material** and **2) are all marked as *Static*** (Select an object in Unity and click the checkbox in the top right of the inspector). GameObjects marked as *Static* cannot be moved throughout your application's runtime. Thus, static batching can be difficult to leverage on HoloLens where virtually every object needs to be placed, moved, scaled, etc. For immersive headsets, static batching can dramatically reduce draw calls and thus improve performance.
 
 Read *Static Batching* under [Draw Call Batching in Unity](https://docs.unity3d.com/Manual/DrawCallBatching.html) for more details.
 
-#### Dynamic Batching
+#### Dynamic batching
 
 Since it is problematic to mark objects as *Static* for HoloLens development, dynamic batching can be a great tool to compensate for this lacking feature. Of course, it is can also be useful on immersive headsets as well. Dynamic batching in Unity can be difficult though to enable because GameObjects must **a) share the same Material** and **b) meet a long list of other criteria**.
 
 Read *Dynamic Batching* under [Draw Call Batching in Unity](https://docs.unity3d.com/Manual/DrawCallBatching.html) for the full list. Most commonly, GameObjects become invalid to be batched dynamically because the associated mesh data can be no more than 300 vertices.
 
-#### Other Techniques
+#### Other techniques
 
 Batching can only occur if multiple GameObjects are able to share the same material. Typically this will be blocked by the need for GameObjects to have a unique texture for their respective Material. It is common to combine Textures into one big Texture, a method known as [Texture Atlasing](https://en.wikipedia.org/wiki/Texture_atlas).
 
@@ -281,23 +286,29 @@ Further, it is generally preferable to combine meshes into one GameObject where 
 >[!NOTE]
 > Modifying properties of Renderer.material at runtime will create a copy of the Material and thus potentially break batching. Use Renderer.sharedMaterial to modify shared material properties across GameObjects.
 
-### GPU Performance Recommendations
+### GPU performance recommendations
 
-#### Understand Bandwidth vs Fill Rate
-When rendering a frame on the GPU, an application is generally either bounded my memory bandwidth or fill rate
+#### Understanding bandwidth vs fill Rate
+When rendering a frame on the GPU, an application is generally either bounded my memory bandwidth or fill rate.
 
 - **Memory bandwidth** is the rate of reads and writes the GPU can perform from memory
     - To identify bandwidth limitations, reduce texture quality and check if framerate improved. In Unity, this can be done by changing Texture Quality in **Edit** > **Project Settings** > **[Quality Settings](https://docs.unity3d.com/Manual/class-QualitySettings.html)**.
 - **Fill rate** refers to the throughput of rendered pixels that can be drawn per second by the GPU.
-    - To identify fill rate limitations, decrease the display resolution and check if framerate improved. In Unity, this can be done via <span style="red">combine with up above?</span>
+    - To identify fill rate limitations, decrease the display resolution and check if framerate improved. In Unity, this can be done via the  *[XRSettings.renderViewportScale](https://docs.unity3d.com/ScriptReference/XR.XRSettings-renderViewportScale.html)* property
 
-<span style="color:red">
-Talk about stuff*
-</span>
+Memory bandwidth generally involves optimizations to either
+1) decrease texture resolutions
+2) utilize less textures (i.e normals, specular, etc)
 
-#### General
+Fill rate is primarily focused on reducing the number of operations that need to be computed for a final rendered pixel. Examples of this commonly fall into reducing
+1) number of objects to render/process
+2) number of operations per shader
+3) number of GPU stages to final result (geometry shaders, post-processing effects, etc)
+4) number of pixels to render (i.e display resolution)
 
-##### Reduce poly count
+https://unity3d.com/learn/tutorials/temas/performance-optimization/optimizing-graphics-rendering-unity-games
+
+#### Reduce poly count
 Higher polygon counts result in more operations for the GPU and reducing the number of polygons in your scene will reduce the amount of time to render that geometry. There are other factors involved as well in shading the geometry that can still be expensive but polygon count is the base metric to determine how expensive a scene will be to render. 
 
 Polygon count is usually reduced by either
@@ -305,7 +316,7 @@ Polygon count is usually reduced by either
 2) Asset decimation which reduces the number of polygon for a given object
 3) Implementing a [Level of Detail (LOD) System](https://docs.unity3d.com/Manual/LevelOfDetail.html) into your application which renders far away objects with lower-polygon version of the geometry
 
-##### Limit overdraw
+#### Limit overdraw
 
 High overdraw occurs when multiple objects are rendered but not outputted to the screen as they are hidden by another object. Imagine looking at a wall that had multiple rooms and geometry behind it. All of the geometry would be processed for rendering but only the opaque wall really needs to be rendered as it occludes the view of all other content. This results in wasteful operations that are not needed for the current view.
 
@@ -313,32 +324,55 @@ In Unity, one can view overdraw for their scene, by toggling the [**draw mode me
 
 Generally, overdraw can be mitigated by culling objects ahead of time before they are sent to the GPU. Unity provides details on implementing [Occlusion Culling](https://docs.unity3d.com/Manual/OcclusionCulling.html) in their engine. 
 
-##### Remove or limit post-processing effects
-Post-processing effects can be very expensive and generally inhibit the fill rate of your application. This also includes anti-aliasing techniques such as MSAA. On HoloLens, it is recommended to avoid these techniques entirely. 
-
-<span style="color:red">
-- Sub-pixel triangles are very expensive.
-- HoloLens => Avoid Geometry, Hull and Compute Shaders.
-https://unity3d.com/learn/tutorials/temas/performance-optimization/optimizing-graphics-rendering-unity-games
-</span>
-
 #### Shaders
 
-<span style="color:red">
-how you draw
-How to get shader stats ouptut
-</span><br/>
-Use bilinear whenever possible.
-such as trying to rearrange expressions to use the mad intrinsics in order to do a multiply and an add at the same time.
-And of course, precalculate as much as you can on the CPU and pass as constants to the material. Whenever that isn't possible, do as much as you can in the vertex shader. Even for things that vary per-pixel you can sometimes get away with doing parts of the calculation in the vertex shader.
+Shaders are small programs that run on the GPU and generally determine two important steps in rendering:
+1) which pixels an object's vertices should be drawn to on the screen (i.e the Vertex shader)
+    - The Vertex shader is generally executed per vertex for every GameObject
+2) what color those pixels (i.e the Pixel shader)
+    - The Pixel shader is executed per pixel for the texture being rendered for device present
+
+Typically shaders perform many transformations and lighting calculations. Although complex lighting models, shadows, and other operations can generate fantastic results, they also come with a price. Reducing the number of operations computed in shaders can greatly reduce the overall work needed to be done by a GPU per frame.
+
+##### Understanding shaders in Unity
+
+Any easy approximation to compare shaders in performance is to identify the average number of operations each executes at runtime. This can be done fairly easily in Unity.
+
+1) Select your shader asset or select a material, then in top right corner of the inspector window, select the gear icon and then **"Select Shader"**
+
+    ![Select shader in Unity](images/Select-shader-unity.png)
+2) With the shader asset selected, click the **"Compile and show code"** button under the inspector window
+
+    ![Compile Shader Code in Unity](images/compile-shader-code-unity.PNG)
+
+3) After compiling, look for the statistics section in the results with the number of different operations for both the vertex and pixel shader (Note: pixel shaders are often also called fragment shaders)
+
+    ![Unity Standard Shader Operations](images/unity-standard-shader-compilation.png)
+
+##### Unity Standard shader alternatives
+
+Instead of using a physically based rendering (PBR) or other high-quality shader, look at utilizing a more performant and cheaper shader. [Mixed Reality Toolkit](https://github.com/Microsoft/MixedRealityToolkit-Unity) provides a [standard shader](https://github.com/Microsoft/MixedRealityToolkit-Unity/blob/master/Assets/HoloToolkit/Common/Shaders/Standard.shader) that has been optimized for mixed reality projects.
+
+Unity also provides an unlit, vertex lit, diffuse, and other simplified shader options that are significantly faster compared to the Unity Standard shader. See [Usage and Performance of Built-in Shaders](https://docs.unity3d.com/Manual/shader-Performance.html) for more detailed information.
+
+##### Shader coding recommendations
+
+- Use bilinear filtering whenever possible
+- Rearrange expressions to use MAD intrinsics in order to do a multiply and an add at the same time
+- Precalculate as much as possible on the CPU and pass as constants to the material
+- Favor moving operations from the pixel shader to the vertex shader
+    - Generally the # of vertices << # of pixels (i.e 720p == 921,600 pixels, 1080p == 2,073,600 pixels, etc)
+
+#### Remove GPU stages
+Post-processing effects can be very expensive and generally inhibit the fill rate of your application. This also includes anti-aliasing techniques such as MSAA. On HoloLens, it is recommended to avoid these techniques entirely. Furthermore, additional shader stages such as geometry, hull, and compute shaders should be avoided when possible.
 
 ### Memory recommendations
 
-Excessive memory allocation & deallocation operations can have adverse effects on your holographic application resulting in inconsistent performance, frozen frames, and other detrimental behavior. It is particullary important to understand memory considerations when developing in Unity since memory management is controlled by the garbage collector.
+Excessive memory allocation & deallocation operations can have adverse effects on your holographic application resulting in inconsistent performance, frozen frames, and other detrimental behavior. It is especially important to understand memory considerations when developing in Unity since memory management is controlled by the garbage collector.
 
 #### Garbage collection
 
-Holographic apps will loose processing compute time to the garbage collector when the GC is activated to analyze objects that are no longer in scope during execution and their memory needs to be released so it can be made available for re-use. Constant allocations and de-allocations will generally require the garbage collector to run more frequently thus hurting performance and user experience.
+Holographic apps will loose processing compute time to the garbage collector (GC) when the GC is activated to analyze objects that are no longer in scope during execution and their memory needs to be released so it can be made available for re-use. Constant allocations and de-allocations will generally require the garbage collector to run more frequently thus hurting performance and user experience.
 
 Unity has provided an excellent page that explains in detail how the garbage collector works and tips to write more efficient code in regards to memory management.
 - [Optimizing garbage collection in Unity games](https://unity3d.com/learn/tutorials/topics/performance-optimization/optimizing-garbage-collection-unity-games?playlist=44069)
@@ -352,7 +386,7 @@ Other quick tips:
 
 #### Object pooling
 
-Ojbect pooling is a popular technique to reduce the cost of continuous allocations & deallocations of objects. This is done by allocating a large pool of an identical objects and re-using inactive, available instances from this pool instead of constantly spawning and destroying objects over time. Object pools are great for re-useable components that have variable lifetime during an app.
+Object pooling is a popular technique to reduce the cost of continuous allocations & deallocations of objects. This is done by allocating a large pool of an identical objects and re-using inactive, available instances from this pool instead of constantly spawning and destroying objects over time. Object pools are great for re-useable components that have variable lifetime during an app.
 
 - [[Unity] Object Pooling Tutorial](https://unity3d.com/learn/tutorials/topics/scripting/object-pooling) 
 
@@ -362,7 +396,7 @@ You should consider starting your app with a smaller scene, then using *[SceneMa
 
 Remember that while the startup scene is loading the holographic splash screen will be displayed to the user.
 
-## See Also
+## See also
 - [Optimizing graphics rendering in Unity games](https://unity3d.com/learn/tutorials/temas/performance-optimization/optimizing-graphics-rendering-unity-games?playlist=44069)
 - [Optimizing garbage collection in Unity games](https://unity3d.com/learn/tutorials/topics/performance-optimization/optimizing-garbage-collection-unity-games?playlist=44069)
 - [Physics Best Practices [Unity]](https://unity3d.com/learn/tutorials/topics/physics/physics-best-practices)

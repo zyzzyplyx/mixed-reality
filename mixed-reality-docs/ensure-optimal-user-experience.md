@@ -5,10 +5,10 @@ author: trferrel
 ms.author: trferrel
 ms.date: 10/11/2018
 ms.topic: article
-keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR
+keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR, performance, LSR, tracking
 ---
 
-# Critical Concepts to Ensure Optimal User Experience
+# Critical concepts to ensure optimal user experience
 
 Unlike traditional programming, holographic development has unique challenges to solve and configurations to optimize. This article will introduce valuable development concepts that when applied correctly can greatly improve tracking and hologram stability in a mixed reality application. Similar to how laggy video or high-latency network performance can degrade user experience, poor tracking and holographic rendering deteriorates the overall quality of an application.
 
@@ -20,11 +20,11 @@ Applications that do not properly configure the following will likely receive fe
 - [Device Calibration](#device-calibration)
 - [Interpupillary Distance (IPD)](#interpupillary-distance-ipd)
 
-## Frame Rate
+## Frame rate
 
 *Frame rate*, also known as FPS (Frames per second), is **one of the most critical indicators** that determines how optimal your application’s user experience will be.
 
-### What is Frame Rate?
+### What is frame rate?
 Frame rate is a metric equal to the number of times per second your app can present an image to the user in their device.
 
 Developers need to ensure their applications meet the target framerate that is determined by the type of device running the app. See the table below for frame rates on your targeted device endpoint.
