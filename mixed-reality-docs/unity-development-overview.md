@@ -45,7 +45,7 @@ A framerate counter can easily be enabled in Unity with the [Mixed Reality Toolk
 
 To learn more about framerate, see [Critical Concepts to Ensure Optimal User Experience](ensure-optimal-user-experience.md)
 
-### Single Pass Instanced Rendering
+### Single pass instanced rendering
 
 Single Pass Instanced Rendering in Unity allows XR applications to reduce and optimizes the draw operations needed for each eye. Turning this feature ON will optimize the rendering pipeline in Unity to save on both CPU and GPU performance for Mixed Reality projects.
 
@@ -62,7 +62,7 @@ To enable this feature in your Unity Project
 >
 > See [Single Pass Stereo Rendering for HoloLens](https://docs.unity3d.com/Manual/SinglePassStereoRenderingHoloLens.html) from Unity for how to address this problem
 
-### Enable Depth Buffer Sharing
+### Enable depth buffer sharing
 
 The depth buffer for each frame of your application contains depth data for all the scene geometry currently in view from the camera when the application is running. Each pixel of a depth buffer provides a distance to the closest geometry along a ray from that pixel. Sharing this data with the Windows Mixed Reality platform can enhance user experience by improving hologram stability.
 

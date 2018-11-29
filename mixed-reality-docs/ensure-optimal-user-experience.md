@@ -57,7 +57,10 @@ A framerate counter can easily be enabled in Unity with [Mixed Reality Toolkit f
 2) Search in your *Project Window* for **"FPSDisplay.prefab"**
 3) Drag this prefab into your scene
 
-<span style="color:red">{GIF: Show example of FPS indicator in head locked display}</span>
+<span style="color:red">
+{GIF: Show example of FPS indicator in head locked display}
+What physical space to show with HoloLens?
+</span>
 
 >[!NOTE]
 > One can also view their app's framerate via the **System Performance** page of **[Device Portal](using-the-windows-device-portal.md)**. The *Device Portal* lets you configure and manage your device remotely over Wi-Fi or USB via a web browser page. Setup via instructions [here](using-the-windows-device-portal.md). Once enabled, on the left hand-side, look for the tab **Performance/System Performance**. The frame rate section on this page will track current frame rate and graph over time.
@@ -95,7 +98,7 @@ If you are writing an application with DirectX, read [Rendering in DirectX](rend
 
 HoloLens is constantly scanning and reasoning the current environment via multiple environment understand and tracking cameras on device (see image below). The device keeps track of several [coordinate systems](coordinate-systems.md) and their relationship to one another based on prominent features identified in the physical space. The platform abstracts much of these calculations so that developers only have to worry about the [coordinate system in Unity](coordinate-systems-in-unity.md).
 
-![Environment Understand Cameras](images/sensor-bar-400px.jpg)
+![Environment Understanding Cameras](images/sensor-bar-400px.jpg)
 
 >[!NOTE]
 > The initial position of the user in the physical world when a Unity holographic app starts will become the origin (i.e <0,0,0\>) in the Unity coordinate system. Further, the user's initial head orientation will become Unity's world Z-forward(+) > axis , which will correspondingly make the X-axis orthogonal to the initial orientation.

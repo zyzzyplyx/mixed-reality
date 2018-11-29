@@ -8,7 +8,7 @@ ms.topic: article
 keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR
 ---
 
-# Core Windows Mixed Reality Concepts
+# Core Windows Mixed Reality concepts
 
 This article will introduce key understandings for developing with Windows Mixed Reality for building spatial applications. These concepts enable developers to build innovative experiences and help address many of the difficulties and challenges associated with developing mixed reality applications. 
 
@@ -16,21 +16,25 @@ This article will introduce key understandings for developing with Windows Mixed
 
 Windows Mixed Reality allows developers to build 3D spatial applications using innovative hardware and software to understand the user's physical space. Every device has multiple hardware sensor components that provide data of the physical environment which the platform analyzes to surface valuable information to the application.
 
-### Head Tracking
+### Head tracking
 
 In particular, the Windows Mixed Reality devices track the user's pose in their environment. A pose is a position and orientation that defines where the user is and where they are looking in your spatial application.
 
-<span style="color:red">INSERT GIF of camera visualization of pose/device in space (side-by-side of real person?)</span>
+<span style="color:red">
+Need gif/img demonstrating head tracking in space
+Visualization of head tracking cameras performing SLAM and tracking user position in a room/space
+Effectively, how would you answer "What is Head Tracking" with only an image
+</span>
 
 In order to calculate an individual's pose, Windows Mixed Reality devices use **inside-out tracking technology**. Every device has multiple hardware sensor components that provide data of the physical environment which the platform analyzes to perform inside-out tracking as a user moves and rotates through their space. WMR devices are constantly scanning and learning about the physical environment as the user moves and looks from different vantage points.
 
-### Spatial Mapping
+### Spatial mapping
 
 Using data collected by various sensors, HoloLens can build a polygon mesh representative of the physical surfaces in the current environment. This can then be utilized for placing objects (i.e on a wall), occluding holograms (i.e a character behind a couch), and drive other important simulation models such as physics and path finding. The surface reconstruction of the physical space or also known as the spatial map, is built gradually over time as the HoloLens learns more about the environment. The HoloLens can gather new information about the environment if users move and view a space from multiple vantage points. Thus, it is common for HoloLens applications to involve an environment scanning experience so the user fully maps out their physical space before the core application scenarios begin. 
 
 ![Spatial Mapping](images/surfacemapping.png)
 
-## Understanding Interactions
+## Understanding interactions
 
  Mixed Reality apps offer new interaction models compared to traditional application design. This section will introduce some of these new mixed reality input concepts. In particular, these interaction models can become exceedingly powerful when leveraged together.
 
@@ -40,7 +44,7 @@ Since devices can understand where a user is positioned and in which direction t
 
 ![test-gif](images/useriscamera-640px.jpg)
 
-### [Gestures](gestures.md) and [Motion controllers](motion-controllers.md)
+### [Gestures](gestures.md) and [motion controllers](motion-controllers.md)
 
 Users want to touch and nimbly control their Mixed Reality environment. Gestures and motion controllers are the primary means for users to interact with their *hands* in your application. Which you as a developer leverage depends on the device endpoint being targeted. Gestures are used for HoloLens devices and Motion Controllers function in Immersive Headsets. 
 
@@ -50,18 +54,18 @@ The platform recognizes a predefined set of hand gestures and Motion Controller 
 
 ![Motion Controllers](images/winmr-ck-1080x1080-350px.jpg)
 
-### [Voice Input](voice-input.md)
+### [Voice input](voice-input.md)
 The Windows Mixed Reality platform can understand simple verbal commands and keywords. Analogous to Gestures and Motion Controllers, Voice is another form of core input enabling users to take action in their Mixed World. For some scenarios though, voice is a more efficient means of input and communicating intent. For example, when combined with gaze, users can more easily delete a hologram using Voice then trying to target and select a button via gestures/motion controllers. 
 
 ![Voice Input](images/voice.gif)
 
-### [Spatial Audio](spatial-sound.md)
+### [Spatial audio](spatial-sound.md)
 
 To ensure a true spatial experience, the Windows Mixed Reality platform simulates 3D sound allowing users to understand direction and distance with the virtual holograms and UI in their space. Spatial Audio conveys the sense of 3D position for holograms and activity in a holographic application. For example, a developer can redirect a user's attention to look backward by playing audio behind them to draw their attention.
 
 ![Spatial Audio](images/spatialaudio.gif)
 
-## Understanding Your App Runtime
+## Understanding your app runtime
 
 Mixed Reality applications behave very similarly to game runtime dynamics. Your application will process input, update current state and perform app-specific computations, and then render an image to be presented to the user. This process will then loop continuously for the lifetime of your program.
 
