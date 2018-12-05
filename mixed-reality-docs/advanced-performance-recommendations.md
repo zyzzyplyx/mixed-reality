@@ -10,7 +10,7 @@ keywords: Windows Mixed Reality, Mixed Reality, Virtual Reality, VR, MR, Perform
 
 # Advanced performance recommendations
 
-This article deep dives into topics to optimize performance of your Mixed Reality app to ensure you hit target frame rate. User experience can be greatly degraded if your application does not run at optimal frame rate. For review, the performant framerate values for each target platform are listed below.
+This article dives deeper into topics that may help optimize performance of your Mixed Reality app and work towards hitting target frame rates. User experience can be greatly degraded if your application does not run at optimal frame rate. For review, the performant framerate values for each target platform are listed below.
 
 | Platform | Target Frame Rate |
 |----------|-------------------|
