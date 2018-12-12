@@ -37,7 +37,7 @@ If your app has an underperforming framerate, the first step is to analyze and u
 3. **GPU**
     * This processor most commonly handles the graphics pipeline of your application to transform 3D data (models, textures, etc) into pixels and ultimately produce a 2D image to submit to your device's screen.
 
-![Lifetime of a Frame](images/lifetime-of-a-frame.jpg)
+![Lifetime of a Frame](images/lifetime-of-a-frame.png)
 
 Generally, HoloLens applications will be GPU bounded. However, this does not hold true in every application and thus it is recommended to use the tools & techniques below to get to ground-truth for your particular app.
 
@@ -400,4 +400,4 @@ Remember that while the startup scene is loading the holographic splash screen w
 - [Optimizing graphics rendering in Unity games](https://unity3d.com/learn/tutorials/temas/performance-optimization/optimizing-graphics-rendering-unity-games?playlist=44069)
 - [Optimizing garbage collection in Unity games](https://unity3d.com/learn/tutorials/topics/performance-optimization/optimizing-garbage-collection-unity-games?playlist=44069)
 - [Physics Best Practices [Unity]](https://unity3d.com/learn/tutorials/topics/physics/physics-best-practices)
-- [Optimizing Scripts [Unity]](https://docs.unity3d.com/Manual/MobileOptimizationPracticalScriptingOptimizations.html?_ga=2.184268192.743151652.1541786540-1257165747.1521494484)
+- [Optimizing Scripts [Unity]](https://docs.unity3d.com/Manual/MobileOptimizationPracticalScriptingOptimizations.html)

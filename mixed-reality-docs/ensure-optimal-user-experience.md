@@ -36,6 +36,8 @@ Frame rate is a metric equal to the number of times per second your app can pres
 
 Developers should ensure their applications meet the target framerate that is determined by the type of device running the app. See the table below for target frame rates on each device endpoint.
 
+![Frame Rate Example](images/FrameRate.gif)
+
 | Platform | Target frame rate |
 |----------|-------------------|
 | [HoloLens](hololens-hardware-details.md) | 60 FPS |
@@ -64,11 +66,6 @@ A framerate counter can easily be enabled in Unity with [Mixed Reality Toolkit f
 1. Import the MRTK *.unitypackage* into your project
 2. Search in your *Project Window* for "FPSDisplay.prefab"
 3. Drag this prefab into your scene
-
-<span style="color:red">
-{GIF: Show example of FPS indicator in head locked display}
-What physical space to show with HoloLens?
-</span>
 
 >[!NOTE]
 > One can also view their app's framerate via the **System Performance** page of **[Device Portal](using-the-windows-device-portal.md)**. The *Device Portal* lets you configure and manage your device remotely over Wi-Fi or USB via a web browser page. After you [set up access to Device Portal](using-the-windows-device-portal.md), look for the tab **Performance/System Performance** on the left side. The frame rate section on that page will track current frame rate and graph over time.

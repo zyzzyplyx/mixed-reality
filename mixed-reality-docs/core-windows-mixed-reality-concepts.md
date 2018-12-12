@@ -30,11 +30,7 @@ Both device types have multiple sensor components that provide data of the physi
 
 Windows Mixed Reality devices track the user's pose in their environment. A pose is a position and orientation that defines where the user is, and where they are looking, in your spatial application.
 
-<span style="color:red">
-Need gif/img demonstrating head tracking in space
-Visualization of head tracking cameras performing SLAM and tracking user position in a room/space
-Effectively, how would you answer "What is Head Tracking" with only an image
-</span>
+![Head Tracking Demo](images/HeadTracking.gif)
 
 In order to calculate an individual's pose, Windows Mixed Reality devices use **inside-out tracking** technology. Every device has multiple hardware sensors that provide data of the physical environment, which the platform analyzes to perform inside-out tracking as a user moves and rotates through their space. The devices are constantly scanning and learning about the physical environment as the user moves and looks from different vantage points. An advantage of inside-out tracking is that the sensors are in the headset, and therefore require no external set up of cameras, lighthouse markers, etc.
 
@@ -97,8 +93,7 @@ The platform recognizes a predefined set of hand gestures and motion controller 
 ![An example of a gesture, "bloom" brings up the Start or quick action menu](images/bloom-giphy.gif)<br>
 *An example of a gesture, "bloom" brings up the Start or quick action menu*<br>
 
-![Diagram of motion controller](images/motion-controller-diagram.jpg)<br>
-*Diagram of motion controller*<br>
+![Diagram of motion controllers](images/motioncontroller.jpg)<br>
 
 [Learn more about gestures on HoloLens](gestures.md) | [Learn more about motion controllers](motion-controllers.md)
 
@@ -148,7 +143,7 @@ Multiple pose predictions are provided over time because a user's head will move
 
 However, it is important to understand that, unlike traditional development, the user is the camera and Windows Mixed Reality adapts to solving the unique problems related to that.
 
-![Lifetime of a frame](images/lifetime-of-a-frame.jpg)<br>
+![Lifetime of a frame](images/lifetime-of-a-frame.png)<br>
 *Lifetime of a frame*
 
 ## See Also
